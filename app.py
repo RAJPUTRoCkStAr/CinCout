@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import random
 st.set_page_config(page_title='human activity',layout='wide')
 col1,col2,col3 = st.columns([2,4,2])
@@ -22,15 +23,16 @@ with col4:
     st.camera_input('something')
 with col5:
     
-    data = pd.DataFrame(
-         {
-        "Activity Name": ["Roadmap", "Extras", "Issues"],
-        "url": ["https://roadmap.streamlit.app", "https://extras.streamlit.app", "https://issues.streamlit.app"],
-        "Time": [random.randint(0, 1000) for _ in range(3)],
-        "Start_time": [[random.randint(0, 5000) for _ in range(30)] for _ in range(1)],
-        "End_time/Live": [[random.randint(0, 5000) for _ in range(30)] for _ in range(1))]],
+    data =pd.DataFrame(
+    {
+        "A": 1.0,
+        "B": pd.Timestamp("20130102"),
+        "C": pd.Series(1, index=list(range(4)), dtype="float32"),
+        "D": np.array([3] * 4, dtype="int32"),
+        "E": pd.Categorical(["test", "train", "test", "train"]),
+        "F": "foo",
     }
-    )
+)
     st.dataframe(data,hide_index=True,use_container_width=True)
 
 col7,col8,col9 = st.columns([2,4,2])
