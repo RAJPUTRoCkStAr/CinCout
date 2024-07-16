@@ -20,7 +20,7 @@ with col3:
 
 col4,col5 = st.columns([4,2])
 with col4:
-    st.camera_input('something')
+    st.camera_input('Live camera')
 with col5:
     
     data =pd.DataFrame(
