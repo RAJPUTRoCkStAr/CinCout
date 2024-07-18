@@ -12,25 +12,23 @@ with col3:
     login = st.button('login',use_container_width=True,type='primary')
     if login:
         st.write('login button is clicked')
-
-
     signup = st.button('signup',use_container_width=True,type='primary')
     if signup:
         st.write('signup button is clicked')
 
-col4,col5 = st.columns([4,2])
+col4,col5 = st.columns([4,3])
 with col4:
-    st.camera_input('Live camera')
+    st.camera_input('Live camera',label_visibility="hidden")
 with col5:
     
     data =pd.DataFrame(
     {
-        "A": 1.0,
-        "B": pd.Timestamp("20130102"),
-        "C": pd.Series(1, index=list(range(4)), dtype="float32"),
-        "D": np.array([3] * 4, dtype="int32"),
-        "E": pd.Categorical(["test", "train", "test", "train"]),
-        "F": "foo",
+        "Sno": 1.0,
+        "Date": pd.Timestamp("20130102"),
+        "start-time": pd.Series(1, index=list(range(4)), dtype="float32"),
+        "End-time": np.array([3] * 4, dtype="int32"),
+        "Activity": pd.Categorical(["test", "train", "test", "train"]),
+        "Total-time": "foo",
     }
 )
     st.dataframe(data,hide_index=True,use_container_width=True)
