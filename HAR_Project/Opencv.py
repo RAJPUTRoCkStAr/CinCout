@@ -31,7 +31,8 @@ while True:
     if not grabbed:
         print("[INFO] No frame read from the video stream - Exiting...")
         break
-    frame = imutils.resize(frame, width=350)
+    frame = imutils.resize(frame, height= 750,width=750)
+    frame = cv2.flip(frame,1)
     frames.append(frame)
     if len(frames) < SAMPLE_DURATION:
         continue
