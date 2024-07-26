@@ -1,3 +1,4 @@
+/* main-style.css */
 body {
     background-color: skyblue;
     color: white;
@@ -10,13 +11,15 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-
 }
 
 header {
     display: flex;
     align-items: center;
     padding: 20px;
+    position: relative; /* Add this line */
+    width: 100%; /* Add this line */
+    justify-content: center; /* Add this line */
 }
 
 .corner-image {
@@ -24,15 +27,17 @@ header {
     top: 0px;
     left: 4px;
 }
+
 .corner-LS {
     position: absolute;
     top: 3px;
-    left: 1330px;
+    right: 4px; /* Adjusted to the right */
 }
-span{
-color:#e10808;
 
+span {
+    color: #e10808;
 }
+
 h1 {
     font-size: 2rem;
 }
@@ -43,7 +48,6 @@ nav {
 
 .nav-button {
     background-color: #2c2a2a;
-    float:right;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -52,24 +56,29 @@ nav {
     font-size: 1rem;
     border-radius: 4px;
 }
-.nav-button:hover{
-    background-color: green;
 
+.nav-button:hover {
+    background-color: green;
 }
 
 main {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Add this line */
     justify-content: center;
     align-items: center;
     margin: 10px;
-    /* height: 600px; */
-    
+}
+
+.camera-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .camera {
     background-color: #24415a;
-    min-width:800px;
+    width: 800px;
     height: 450px;
     border-radius: 3px;
     display: flex;
@@ -77,22 +86,23 @@ main {
     justify-content: center;
     animation: borderAnimation 5s linear infinite;
 }
-.output-box{
-    margin-left: 160px;
+
+.output-box {
     background-color: #eaedef;
-    min-width:400px;
+    width: 400px;
     height: 450px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     text-align: center;
-
+    color: black; /* Adjusted color to black */
 }
 
 .camera-placeholder {
     text-align: center;
-    margin-left:100px;
-    padding: 0;
     font-size: 1.2rem;
-    text-align: center;
 }
 
 .camera-placeholder a {
@@ -103,8 +113,8 @@ main {
 .controls {
     display: flex;
     margin-top: 20px;
-    /* width: 10px; */
-    /* height: 50px; */
+    justify-content: center; /* Center the buttons */
+    flex-wrap: wrap; /* Ensure buttons wrap if there's not enough space */
 }
 
 .control-button {
@@ -112,40 +122,38 @@ main {
     color: white;
     border: none;
     padding: 14px 10px;
-    margin: 0 10px;
+    margin: 10px; /* Adjusted margin for better spacing */
     cursor: pointer;
-    font-size:15px;
+    font-size: 15px;
     border-radius: 4px;
-    bottom: 100px;
-
 }
-.control-button:hover{
-background-color: green;
 
+.control-button:hover {
+    background-color: green;
 }
-.btn{
+
+.btn {
     background-color: #1241ec;
     color: white;
     border: none;
     padding: 5px 5px;
-    margin: 0 10px;
+    margin: 10px; /* Adjusted margin for better spacing */
     cursor: pointer;
-    font-size:10px;
+    font-size: 10px;
     border-radius: 4px;
 }
 
-input[type="file"]{
+input[type="file"] {
     background-color: #051efc;
     border-radius: 5px;
     padding: 5px;
     cursor: pointer;
     width: 100px;
 }
-input[type="file"]:hover{
-    background-color: green; 
+
+input[type="file"]:hover {
+    background-color: green;
 }
-
-
 
 @keyframes borderAnimation {
     0% {

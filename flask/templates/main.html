@@ -1,0 +1,100 @@
+<!-- main.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main-style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="corner-image">
+                <img src="{{ url_for('static', filename='/media/logo.png') }}" width="100" height="120" alt="logo">
+            </div>
+            <img src="{{ url_for('static', filename='/media/logo.jpeg') }}" width="90" height="90" alt="">
+            <h1><span>H</span>uman <span>A</span>ctivity <span>D</span>etection</h1>
+            <nav>
+                <div class="corner-LS">
+                  <button class="nav-button"><a style="color: white; text-decoration: none;" href="/signup">Logout</a></button>
+                      <button class="nav-button"><a style="color: white; text-decoration: none;" href="/signup">Signup</a></button> 
+                     <form action="{{ url_for('signup') }}" method="post">
+
+                </div>
+            </nav>
+        </header>
+       
+        <main>
+            <div class="camera-container">
+                <div class="camera">
+                    <video id="video" width="100%" height="100%" autoplay></video>
+                </div>
+                <div class="output-box">
+                    <div class="camera-placeholder" id="camera-placeholder">
+                        <p>This app would like to use your camera.</p>
+                        <a href="#">Learn how to allow access.</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn"><input type="file" name='upload'></button>
+                <button class="control-button">Monitor</button>
+                <button class="control-button">Dashboard</button>
+                <button class="control-button">Contact Us</button>
+            </div>
+        </main>                    
+    </div>
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+</body>
+</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main-style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="corner-image">
+                <img src="{{ url_for('static', filename='media/logo.png') }}" width="100" height="120" alt="logo">
+            </div>
+            <img src="{{ url_for('static', filename='media/logo.jpeg') }}" width="90" height="90" alt="">
+            <h1><span>H</span>uman <span>A</span>ctivity <span>D</span>etection</h1>
+            <nav>
+                <div class="corner-LS">
+                  <button class="nav-button"><a style="color: white; text-decoration: none;" href="{{ url_for('login') }}">Logout</a></button>
+                </div>
+            </nav>
+        </header>
+       
+        <main>
+            <div class="camera-container">
+                <div class="camera">
+                    <video id="video" width="100%" height="100%" autoplay></video>
+                </div>
+                <div class="output-box">
+                    <div class="camera-placeholder" id="camera-placeholder">
+                        <p>This app would like to use your camera.</p>
+                        <a href="#">Learn how to allow access.</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn"><input type="file" name='upload'></button>
+                <button class="control-button">Monitor</button>
+                <button class="control-button">Dashboard</button>
+                <button class="control-button">Contact Us</button>
+            </div>
+        </main>                    
+    </div>
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+</body>
+</html>
+
