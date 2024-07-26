@@ -1,0 +1,1 @@
+python image_activity_recognition.py --model resnet-34_kinetics.onnx --classes Actions.txt --input yoga1.jpeg --output yogapred.png --display 1 --gpu 1
