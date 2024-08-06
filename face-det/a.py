@@ -5,10 +5,14 @@ import smtplib
 import random
 import string
 import sqlite3
+import re
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 st.set_page_config(page_title="IAA", layout="wide")
+
 
 job_roles = {
     "School": [
@@ -39,8 +43,12 @@ job_roles = {
         "Customer Service Representative", "Network Administrator"
     ]
 }
+
+
 conn = sqlite3.connect('users.db')
 c = conn.cursor()
+
+
 c.execute('''
           CREATE TABLE IF NOT EXISTS users
           (id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -53,6 +61,8 @@ c.execute('''
            place_name TEXT)
           ''')
 conn.commit()
+
+
 selected = option_menu(None, ["School", "University", "Hospital", 'Office'], 
     icons=['backpack', 'book', "heart-pulse", 'buildings'], 
     menu_icon=None, default_index=0, orientation="horizontal")
@@ -67,8 +77,8 @@ def send_thank_you_email(email, username, password, job_role, item, place_name):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = 'luciferdevil565656@gmail.com'
-        smtp_password = 'firy tlnp iffz jtum'
+        smtp_username = os.getenv('SMTP_USERNAME')
+        smtp_password = os.getenv('SMTP_PASSWORD')
         message = MIMEMultipart()
         message['From'] = smtp_username
         message['To'] = email
@@ -115,28 +125,33 @@ def signup(item):
         email = st.text_input("Enter your email address")
         password = st.text_input("Enter your password", type="password")
         submitted = st.form_submit_button("Submit")
-        clear = st.form_submit_button("Clear")
+        
         if submitted:
-            c.execute('''
-                SELECT * FROM users 
-                WHERE name = ? AND email = ? AND job_role = ? AND place_name = ? AND item = ?
-            ''', (name, email, job_role, place_name, item))
-            if c.fetchone():
-                st.info('A user with the same name, email, job role, and place name already exists. Please try again.')
-                tts('A user with the same name, email, job role, and place name already exists. Please try again.')
+
+            if not name or not email or not password or not place_name:
+                st.error("Please fill in all required fields.")
+            elif not re.match("^[A-Za-z\s]+$", name):
+                st.error("Name should contain only alphabets and spaces.")
+            elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                st.error("Please enter a valid email address.")
             else:
-                username = generate_username(name)
-                c.execute('SELECT * FROM users WHERE username = ?', (username,))
-                if c.fetchone() is None:
-                    c.execute('INSERT INTO users (name, job_role, email, username, password, item, place_name) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                              (name, job_role, email, username, password, item, place_name))
-                    conn.commit()
-                    send_thank_you_email(email, username, password, job_role, item, place_name)
+                c.execute('''
+                    SELECT * FROM users 
+                    WHERE name = ? AND email = ? AND job_role = ? AND place_name = ? AND item = ?
+                ''', (name, email, job_role, place_name, item))
+                if c.fetchone():
+                    st.error('A user with the same name, email, job role, and place name already exists. Please try again.')
                 else:
-                    st.error('Username already exists. Please try again.')
-                    tts('Username already exists. Please try again.')
-        if clear:
-            st.experimental_rerun()
+                    username = generate_username(name)
+                    c.execute('SELECT * FROM users WHERE username = ?', (username,))
+                    if c.fetchone() is None:
+                        c.execute('INSERT INTO users (name, job_role, email, username, password, item, place_name) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+                                  (name, job_role, email, username, password, item, place_name))
+                        conn.commit()
+                        send_thank_you_email(email, username, password, job_role, item, place_name)
+                    else:
+                        st.error('Username already exists. Please try again.')
+
 
 def login(item):
     st.subheader("Log in Here 👇", divider='rainbow')
@@ -144,16 +159,24 @@ def login(item):
         username = st.text_input("Enter your username")
         password = st.text_input("Enter your password", type="password")
         re_sub = st.form_submit_button("Submit")
+        
         if re_sub:
-            c.execute('SELECT * FROM users WHERE username = ? AND password = ? AND item = ?', (username, password, item))
-            if c.fetchone():
-                st.success(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
-                tts(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
+            if not username or not password:
+                st.error("Please enter both username and password.")
             else:
-                st.error('Invalid username or password. Please try again.')
+                c.execute('SELECT * FROM users WHERE username = ? AND password = ? AND item = ?', (username, password, item))
+                if c.fetchone():
+                    st.success(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
+                    tts(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
+                else:
+                    st.error('Invalid username or password. Please try again.')
+
+
 select = option_menu(None, ["Registration", 'Login'], 
     icons=['r-square', 'box-arrow-in-right'], 
     menu_icon=None, default_index=0, orientation="horizontal")
+
+
 if selected == "School":
     if select == 'Registration':
         signup("School")
