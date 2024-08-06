@@ -1,7 +1,5 @@
-                   #   This command use for video
-# python HAR.py --model resnet-34_kinetics.onnx --classes Actions.txt --input videos/example_activities.mp4 --gpu 1 --output output.mp4
-# python Videos.py --model resnet-34_kinetics.onnx --classes Actions.txt --input media/boxing.mp4 --output output.mp4 --gpu 1 --yolo-cfg yolov3.cfg --yolo-weights yolov3.weights --yolo-classes coco.names
-
+#python Videos.py --model resnet-34_kinetics.onnx --classes Actions.txt --input media/boxing.mp4 --output output.mp4 --gpu 1 --yolo-cfg yolov3.cfg --yolo-weights yolov3.weights --yolo-classes coco.names
+#python Videos.py --model resnet-34_kinetics.onnx --classes Actions.txt --yolo-cfg yolov3.cfg --yolo-weights yolov3.weights --yolo-classes coco.names
 
 
 
@@ -151,9 +149,9 @@ while True:
         # Write frame to output
         if writer is not None:
             writer.write(frame)
-
-# Release resources
 vs.release()
 if writer is not None:
     writer.release()
 cv2.destroyAllWindows()
+
+

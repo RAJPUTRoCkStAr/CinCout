@@ -9,12 +9,12 @@ with col1:
 with col2:
     st.title('Real Time Activity Detection')
 with col3:
-    login = st.button('login',use_container_width=True,type='primary')
-    if login:
-        st.write('login button is clicked')
-    signup = st.button('signup',use_container_width=True,type='primary')
-    if signup:
-        st.write('signup button is clicked')
+    option = st.selectbox(
+        "How would you like to be contacted?",
+        ("Login","Contact US"),
+    )
+
+    st.write("You selected:", option)
 
 col4,col5 = st.columns([4,3])
 with col4:
