@@ -131,7 +131,7 @@ def crop_image_with_ratio(img, height,width,middle):
 ################################################### Defining Static Data ###############################################
 
 user_color      = '#000000'
-title_webapp    = "Face Recognition Attendance Sytem"
+title_webapp    = "IAA-I AM AVAILABLE"
 
 html_temp = f"""
             <div style="background-color:{user_color};padding:12px">
