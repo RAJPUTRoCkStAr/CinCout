@@ -1,0 +1,59 @@
+import streamlit as st
+# from streamlit_option_menu import option_menu
+from utils import tts
+import pandas as pd
+import numpy as np
+import random
+st.set_page_config(page_title='human activity',layout='wide')
+col1,col2,col3 = st.columns([2,4,2])
+with col1:
+    st.image('media/logo.png',width=150)
+with col2:
+    st.title('IAA')
+with col3:
+    st.empty()
+col4,col5 = st.columns([4,3])
+with col4:
+    st.camera_input('Live camera',label_visibility="hidden")
+with col5:
+    
+    data =pd.DataFrame(
+    {
+        "Sno": 1.0,
+        "Date": pd.Timestamp("20130102"),
+        "start-time": pd.Series(1, index=list(range(4)), dtype="float32"),
+        "End-time": np.array([3] * 4, dtype="int32"),
+        "Activity": pd.Categorical(["test", "train", "test", "train"]),
+        "Total-time": "foo",
+    }
+)
+    st.dataframe(data,hide_index=True,use_container_width=True)
+
+col7,col8,col9 = st.columns([2,4,2])
+with col7:
+    upload = st.button('upload',use_container_width=True,type='primary')
+    if upload:
+        st.write('upload button clicked')
+
+    monitor = st.button('monitor',use_container_width=True,type='primary')
+    if monitor:
+        st.write('monitor button clicked',)
+with col8:
+    notify = st.button('silent notification',use_container_width=True,type='primary')
+    if notify:
+        st.write('silent notification button clicked')
+
+
+    loudnotify = st.button('loud notification',use_container_width=True,type='primary')
+    if loudnotify:
+        st.write('loud notification clicked')
+with col9:
+    dash = st.button('dashboard',use_container_width=True,type='primary')
+    if dash:
+        st.write('dashboard button clicked')
+
+
+    contact_us = st.button('contact us',use_container_width=True,type='primary')
+    if contact_us:
+        st.write('contact us button clicked')
+        

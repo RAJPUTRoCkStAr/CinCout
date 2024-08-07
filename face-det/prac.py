@@ -10,45 +10,15 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import os
+import pandas as pd
+import numpy as np
+
 load_dotenv()
 st.set_page_config(page_title="IAA", layout="wide")
 
-# Job roles dictionary
-job_roles = {
-    "School": [
-        "Teacher", "Principal", "Counselor", "Custodian", 
-        "Vice Principal", "Librarian", "Special Education Teacher", 
-        "Substitute Teacher", "School Nurse", "Coach", 
-        "Administrative Assistant"
-    ],
-    "University": [
-        "Professor", "Registrar", "Academic Advisor", "Researcher", 
-        "Associate Professor", "Lecturer", "Teaching Assistant", 
-        "Department Coordinator", "Admissions Officer", "Career Counselor", 
-        "Financial Aid Advisor", "Lab Technician", "IT Support"
-    ],
-    "Hospital": [
-        "Physician", "Nurse", "Technician", "Administrator", 
-        "Surgeon", "Anesthesiologist", "Medical Assistant", 
-        "Radiologic Technologist", "Physical Therapist", 
-        "Occupational Therapist", "Pharmacist", "Laboratory Technician", 
-        "Billing and Coding Specialist", "Patient Care Technician", 
-        "Phlebotomist", "Dietary Aide", "Housekeeping Staff"
-    ],
-    "Office": [
-        "Manager", "Assistant", "IT Specialist", "HR Specialist", 
-        "Receptionist", "Office Manager", "Executive Assistant", 
-        "Operations Manager", "Project Manager", "Marketing Manager", 
-        "Accountant", "Financial Analyst", "Sales Representative", 
-        "Customer Service Representative", "Network Administrator"
-    ]
-}
-
-# Create SQLite connection and cursor
+# Database setup
 conn = sqlite3.connect('users.db')
 c = conn.cursor()
-
-# Create users table if it doesn't exist
 c.execute('''
           CREATE TABLE IF NOT EXISTS users
           (id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -62,11 +32,30 @@ c.execute('''
           ''')
 conn.commit()
 
-# Option menu for category selection
-selected = option_menu(None, ["School", "University", "Hospital", 'Office'], 
-    icons=['backpack', 'book', "heart-pulse", 'buildings'], 
-    menu_icon=None, default_index=0, orientation="horizontal")
+# Job roles
+job_roles = {
+    "School": ["Teacher", "Principal", "Counselor", "Custodian", 
+               "Vice Principal", "Librarian", "Special Education Teacher", 
+               "Substitute Teacher", "School Nurse", "Coach", 
+               "Administrative Assistant"],
+    "University": ["Professor", "Registrar", "Academic Advisor", "Researcher", 
+                   "Associate Professor", "Lecturer", "Teaching Assistant", 
+                   "Department Coordinator", "Admissions Officer", "Career Counselor", 
+                   "Financial Aid Advisor", "Lab Technician", "IT Support"],
+    "Hospital": ["Physician", "Nurse", "Technician", "Administrator", 
+                 "Surgeon", "Anesthesiologist", "Medical Assistant", 
+                 "Radiologic Technologist", "Physical Therapist", 
+                 "Occupational Therapist", "Pharmacist", "Laboratory Technician", 
+                 "Billing and Coding Specialist", "Patient Care Technician", 
+                 "Phlebotomist", "Dietary Aide", "Housekeeping Staff"],
+    "Office": ["Manager", "Assistant", "IT Specialist", "HR Specialist", 
+               "Receptionist", "Office Manager", "Executive Assistant", 
+               "Operations Manager", "Project Manager", "Marketing Manager", 
+               "Accountant", "Financial Analyst", "Sales Representative", 
+               "Customer Service Representative", "Network Administrator"]
+}
 
+# Utility functions
 def generate_username(name):
     base_name = name.lower().replace(' ', '')
     random_suffix = ''.join(random.choices(string.digits, k=4))
@@ -127,7 +116,6 @@ def signup(item):
         submitted = st.form_submit_button("Submit")
         
         if submitted:
-            # Validate all required fields
             if not name or not email or not password or not place_name:
                 st.error("Please fill in all required fields.")
             elif not re.match("^[A-Za-z\s]+$", name):
@@ -135,7 +123,6 @@ def signup(item):
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
                 st.error("Please enter a valid email address.")
             else:
-                # Check for duplicate registration
                 c.execute('''
                     SELECT * FROM users 
                     WHERE name = ? AND email = ? AND job_role = ? AND place_name = ? AND item = ?
@@ -144,7 +131,6 @@ def signup(item):
                     st.error('A user with the same name, email, job role, and place name already exists. Please try again.')
                 else:
                     username = generate_username(name)
-                    # Check for unique username
                     c.execute('SELECT * FROM users WHERE username = ?', (username,))
                     if c.fetchone() is None:
                         c.execute('INSERT INTO users (name, job_role, email, username, password, item, place_name) VALUES (?, ?, ?, ?, ?, ?, ?)', 
@@ -153,7 +139,6 @@ def signup(item):
                         send_thank_you_email(email, username, password, job_role, item, place_name)
                     else:
                         st.error('Username already exists. Please try again.')
-
 
 def login(item):
     st.subheader("Log in Here 👇", divider='rainbow')
@@ -166,7 +151,6 @@ def login(item):
             if not username or not password:
                 st.error("Please enter both username and password.")
             else:
-                # Authenticate user
                 c.execute('SELECT * FROM users WHERE username = ? AND password = ? AND item = ?', (username, password, item))
                 if c.fetchone():
                     st.success(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
@@ -174,29 +158,37 @@ def login(item):
                 else:
                     st.error('Invalid username or password. Please try again.')
 
-# Option menu for registration and login
-select = option_menu(None, ["Registration", 'Login'], 
-    icons=['r-square', 'box-arrow-in-right'], 
-    menu_icon=None, default_index=0, orientation="horizontal")
+# Main app layout with page navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.selectbox("Select Page", ["Home", "Sign Up", "Login", "Contact Us"])
 
-# Display appropriate form based on selection
-if selected == "School":
-    if select == 'Registration':
-        signup("School")
-    if select == 'Login':
-        login("School")
-elif selected == "University":
-    if select == 'Registration':
-        signup("University")
-    if select == 'Login':
-        login("University")
-elif selected == "Hospital":
-    if select == 'Registration':
-        signup("Hospital")
-    if select == 'Login':
-        login("Hospital")
-elif selected == "Office":
-    if select == 'Registration':
-        signup("Office")
-    if select == 'Login':
-        login("Office")
+if page == "Home":
+    col1, col2, col3 = st.columns([2, 4, 2])
+    with col1:
+        st.image('media/logo.png', width=150)
+    with col2:
+        st.title('IAA')
+    with col3:
+        st.write("Welcome to IAA. Please select a page from the sidebar.")
+
+elif page == "Sign Up":
+    selected = st.sidebar.selectbox("Select Institution", ["School", "University", "Hospital", 'Office'])
+    signup(selected)
+
+elif page == "Login":
+    selected = st.sidebar.selectbox("Select Institution", ["School", "University", "Hospital", 'Office'])
+    login(selected)
+
+elif page == "Contact Us":
+    with st.form("contact_form"):
+        contact_name = st.text_input("Name")
+        contact_email = st.text_input("Email")
+        contact_message = st.text_area("Message")
+        contact_submit = st.form_submit_button("Send")
+        if contact_submit:
+            if not contact_name or not contact_email or not contact_message:
+                st.error("Please fill in all fields.")
+            elif not re.match(r"[^@]+@[^@]+\.[^@]+", contact_email):
+                st.error("Please enter a valid email address.")
+            else:
+                st.success(f"Thank you, {contact_name}! Your message has been sent.")

@@ -104,7 +104,7 @@ def view_attendace():
 
         avail_files = [file for file in list(os.listdir(VISITOR_HISTORY))
                        if ((file.endswith(tuple(allowed_image_type))) &
-                                                                              (file.startswith(selected_img) == True))]
+                        (file.startswith(selected_img) == True))]
 
         if len(avail_files)>0:
             selected_img_path = os.path.join(VISITOR_HISTORY,
