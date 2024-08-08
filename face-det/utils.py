@@ -121,42 +121,44 @@ def contact():
         st.write("""fhsdgjiohsdfjihgjihsjihfgjhsjhjifhdjgsdhfgshndjfghjishfjghjfhgjkhjkfjhgjksdfgjhsdjhfgjkhsdfjkghjsdhfgusuidjghsuihgifnjsdfhjghsduighjnjhuidvdsnfuvhuifnvijsvhnjisunfhisdnviufhsdnvifbhsdfjvisdbfivbsbsdbbsdfjiisdhfjgnsdfihgjnsdfjhgjsdhjghjsdngjhsdjghjsdnfvhsdfjbvsdjibhjnrfjivbsjdfbhvsdjirgbjsdhfjignnkvbhsrjiegvsdrhjinfdjksvihuisdnvjinjkfbhsdkr
                 """)
     if select == 'Individual':
-        data_df  = pd.DataFrame(
-               data = {
-        "Name": ["Sumit Kumar Singh", "Mantu Rana", "Mayank Pathak", "Madan HS"],
-        "LinkedIn": [
-            "https://www.linkedin.com/in/sumit-singh-773921262/",
-            "https://www.linkedin.com/in/mantu-kumar-rana-71a6ba25b/",
-            "https://www.linkedin.com/in/mayank-pathak-46168a281/",
-            ""
-        ],
-        "GitHub": [
-            "https://github.com/RAJPUTRoCkStAr",
-            "https://github.com/MantuRana",
-            "https://github.com/MayankPathak13/Internship_AI.git",
-            "https://github.com/Madanedunet"
-        ],
-        "apps": [
-            "media/resized_sumitimg.jpg",
-            "media/resized_mantuimg.jpg",
-            "media/resized_mayankimg.jpg",
-            "media/resized_madanimg.jpg"
-        ]
+        data_df = pd.DataFrame(
+        data={
+            "Name": ["Sumit Kumar Singh", "Mantu Rana", "Mayank Pathak", "Madan HS"],
+            "LinkedIn": [
+                "https://www.linkedin.com/in/sumit-singh-773921262/",
+                "https://www.linkedin.com/in/mantu-kumar-rana-71a6ba25b/",
+                "https://www.linkedin.com/in/mayank-pathak-46168a281/",
+                ""
+            ],
+            "GitHub": [
+                "https://github.com/RAJPUTRoCkStAr",
+                "https://github.com/MantuRana",
+                "https://github.com/MayankPathak13/Internship_AI.git",
+                "https://github.com/Madanedunet"
+            ],
+            "apps": [
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_sumitimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_mantuimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_mayankimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_madanimg.jpg"
+            ]
         }
-        )
-        st.header('Team Individual Profiles')
-        edited_df = st.data_editor(
+    )
+    
+    st.header('Team Individual Profiles')
+    edited_df = st.data_editor(
         data_df,
         column_config={
-        "apps": st.column_config.ImageColumn(
-            "Preview Image", help="Streamlit app preview screenshots"
-        ),
-        "LinkedIn": st.column_config.LinkColumn(
-            "LinkedIn Profile", help="Edit LinkedIn URL",display_text="LinkedIn Profile"
-        ),
-        "GitHub": st.column_config.LinkColumn(
-            "GitHub Profile", help="Edit GitHub URL",display_text="GitHub Profile"
-        )
+            "apps": st.column_config.ImageColumn(
+                "Preview Image", help="Streamlit app preview screenshots"
+            ),
+            "LinkedIn": st.column_config.LinkColumn(
+                "LinkedIn Profile", help="Edit LinkedIn URL", display_text="LinkedIn Profile"
+            ),
+            "GitHub": st.column_config.LinkColumn(
+                "GitHub Profile", help="Edit GitHub URL", display_text="GitHub Profile"
+            )
         },
-        hide_index=True,use_container_width=True
-        )
+        hide_index=True,
+        use_container_width=True
+    )
