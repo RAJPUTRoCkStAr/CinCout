@@ -1,14 +1,11 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from utils import tts, generate_username, send_thank_you_email
+from utils import tts, generate_username, send_thank_you_email,title,contact
 import re
 import sqlite3
 from dash import dashboard
-
-
-st.set_page_config(page_title="IAA", layout="wide")
-
-
+from Home import home
+title()
 conn = sqlite3.connect('users.db')
 c = conn.cursor()
 c.execute('''
@@ -23,7 +20,6 @@ c.execute('''
      place_name TEXT)
 ''')
 conn.commit()
-
 
 job_roles = {
     "School": ["Teacher", "Principal", "Counselor", "Custodian", 
@@ -133,13 +129,7 @@ else:
         icons=['house', 'door-open','box-arrow-in-right','person-rolodex'], menu_icon="cast", default_index=0)
     
     if st.session_state.page == "Home":
-        col1, col2, col3 = st.columns([2, 4, 2])
-        with col1:
-            st.image('media/logo.png', width=150)
-        with col2:
-            st.title('IAA')
-        with col3:
-           st.empty()
+        home()
 
     elif st.session_state.page == "Sign Up":
         selected = st.sidebar.selectbox("Select Institution", ["School", "University", "Hospital", 'Office'])
@@ -150,15 +140,4 @@ else:
         login(selected)
 
     elif st.session_state.page == "Contact Us":
-        with st.form("contact_form", clear_on_submit=True):
-            contact_name = st.text_input("Enter your name")
-            contact_email = st.text_input("Enter your email address")
-            contact_message = st.text_area("Enter your message")
-            contact_submit = st.form_submit_button("Send Message")
-            if contact_submit:
-                if not contact_name or not contact_email or not contact_message:
-                    st.error("Please fill in all required fields.")
-                elif not re.match(r"[^@]+@[^@]+\.[^@]+", contact_email):
-                    st.error("Please enter a valid email address.")
-                else:
-                    st.success(f"Thank you, {contact_name}! Your message has been sent.")
+        contact()
