@@ -1,8 +1,10 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from Attendmain import view_attendace,personadder,clearthing
+from utils import tts
 def dashboard():
-    st.header("Dashboard")
+    st.header(f"Dashboard for {st.session_state.item} Management")
+    st.subheader(f"Welcome  {st.session_state.username}")
     with st.sidebar:
         selected = option_menu("Dashboard Menu", 
         ["Profile", 'Attendance History', 'Manage Attendance','ADD','Logout'],
@@ -21,5 +23,6 @@ def dashboard():
     elif selected == "Logout":
         st.session_state.logged_in = False
         st.session_state.page = "Home"
+        tts(f"Logging you out {st.session_state.username}")
         st.rerun()
 

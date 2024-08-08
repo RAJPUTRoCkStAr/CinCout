@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 from test import test
 import torch
 import datetime
+from utils import tts
 #######################################################
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -49,9 +50,11 @@ def add_data_db(df_visitor_details):
             df_all.drop_duplicates(keep='first', inplace=True)
             df_all.reset_index(inplace=True, drop=True)
             df_all.to_csv(os.path.join(data_path, file_db), index=False)
+            tts('Details Added Successfully!')
             st.success('Details Added Successfully!')
         else:
             df_visitor_details.to_csv(os.path.join(data_path, file_db), index=False)
+            tts('Initiated Data Successfully!')
             st.success('Initiated Data Successfully!')
 
     except Exception as e:
@@ -259,6 +262,7 @@ def Takeattendance():
         image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         with open(os.path.join(VISITOR_HISTORY,f'{visitor_id}.jpg'), 'wb') as file:
             file.write(img_file_buffer.getbuffer())
+            tts('Image Saved Successfully!')
             st.success('Image Saved Successfully!')
             max_faces = 0
             rois = []  
@@ -288,7 +292,13 @@ def Takeattendance():
             #this is for hiding image of if its fake or real
             # st.image(BGR_to_RGB(image_array), width=720)
             # this is to detect whether he is real or fake
-            st.write(spoofs[idx])
+            # st.write(spoofs[idx])
+            if spoofs[idx] == "REAL":
+                tts("Its an Real Image")
+                st.success("Its an Real Image")
+            elif spoofs[idx] == "FAKE":
+                tts("Its an Fake Image")
+                st.error("Its an Fake Image")
             max_faces = len(boxes_int)
             if max_faces > 0:
                 col1, col2 = st.columns(2)
@@ -309,6 +319,7 @@ def Takeattendance():
                         face_encodings  = database_data[COLS_ENCODE].values
                         dataframe = database_data[COLS_INFO]
                         if len(aligned) < 1:
+                            tts(f'Please Try Again for face#{face_idx}!')
                             st.error(f'Please Try Again for face#{face_idx}!')
                         else:
                             face_to_compare = aligned[face_idx].numpy()
@@ -330,12 +341,15 @@ def Takeattendance():
                                 attendance(visitor_id, name_visitor)
                                 flag_show = True
                             else:
+                                tts(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
                                 st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
                                 st.info('Please Update the database for a new person or click again!')
+                                tts('Please Update the database for a new person or click again!')
                                 attendance(visitor_id, 'Unknown')
                     if flag_show == True:
                         st.image(BGR_to_RGB(image_array_copy), width=720)
             else:
+                tts('No human face detected.')
                 st.error('No human face detected.')
 ####################################################################################
 # For adding person
@@ -358,6 +372,7 @@ def personadder():
  
         if ((img_file_buffer is not None) & (len(face_name) > 1) &
             st.button('Image Preview',use_container_width=True)):
+            tts("Previewing image")
             st.subheader("Image Preview")
             st.image(img_file_buffer)
  

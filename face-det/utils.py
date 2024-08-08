@@ -99,7 +99,7 @@ def send_thank_you_email(email, username, password, job_role, item, place_name):
 ##################################################################################
 ##Contact us 
 def contact():
-    st.subheader("Contact us Form")
+    st.subheader("Feedback Form")
     with st.form("contact_form", clear_on_submit=True):
             contact_name = st.text_input("Enter your name")
             contact_email = st.text_input("Enter your email address")
@@ -117,9 +117,31 @@ def contact():
         icons=['people', 'person-bounding-box'],
         menu_icon="microsoft-teams", default_index=0,orientation="horizontal")
     if select == 'Team':
+        st.header('Binary Coders')
+        st.write("""
+        Welcome to the official website of Binary Coders! We are a dynamic team of four passionate tech enthusiasts, united by a shared vision of leveraging technology to solve real-world problems. Our latest project is an innovative attendance and activity detection system designed to streamline processes in hospitals, schools, universities, and offices.
+        """)
         st.image('media/team.jpg',use_column_width=True,caption='team image')
-        st.write("""fhsdgjiohsdfjihgjihsjihfgjhsjhjifhdjgsdhfgshndjfghjishfjghjfhgjkhjkfjhgjksdfgjhsdjhfgjkhsdfjkghjsdhfgusuidjghsuihgifnjsdfhjghsduighjnjhuidvdsnfuvhuifnvijsvhnjisunfhisdnviufhsdnvifbhsdfjvisdbfivbsbsdbbsdfjiisdhfjgnsdfihgjnsdfjhgjsdhjghjsdngjhsdjghjsdnfvhsdfjbvsdjibhjnrfjivbsjdfbhvsdjirgbjsdhfjignnkvbhsrjiegvsdrhjinfdjksvihuisdnvjinjkfbhsdkr
-                """)
+        # Vision
+        st.subheader("Our Vision")
+        st.write("""
+        At Binary Coders, we believe in the transformative power of technology. Our current project aims to revolutionize the way attendance is marked and activities are monitored across various sectors. We are committed to delivering a solution that is not only innovative but also practical and easy to implement. By combining our diverse skill sets, we are creating a system that enhances efficiency, security, and accuracy, all while being user-friendly.
+        """)
+
+        # Why Choose Us?
+        st.subheader("Why Choose Us?")
+        st.write("""
+        - **Expertise Across Disciplines:** Each member of our team brings a unique set of skills and expertise to the table, ensuring that all aspects of the project are handled with the utmost professionalism.
+        - **Innovation-Driven:** We are constantly exploring new technologies and methodologies to improve our solutions, ensuring that our system stays ahead of the curve.
+        - **User-Centered Design:** Our focus is always on the end-user. We strive to create systems that are not only powerful but also intuitive and easy to use.
+        - **Commitment to Quality:** From the initial concept to the final product, quality is at the heart of everything we do. We are dedicated to delivering solutions that meet the highest standards of excellence.
+        """)
+
+        # Closing
+        st.write("""
+        ### Join Us on Our Journey
+        We invite you to follow our progress as we work to bring this project to life. Whether you're a potential partner, client, or simply someone who shares our passion for technology, we're excited to have you with us on this journey.
+        """)
     if select == 'Individual':
         data_df = pd.DataFrame(
         data={
@@ -137,16 +159,16 @@ def contact():
                 "https://github.com/Madanedunet"
             ],
             "apps": [
-                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_sumitimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/sumitimg.jpg",
                 "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_mantuimg.jpg",
                 "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_mayankimg.jpg",
                 "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_madanimg.jpg"
             ]
         }
     )
-    
-    st.header('Team Individual Profiles')
-    edited_df = st.data_editor(
+
+        st.header('Team Individual Profiles')
+        edited_df = st.data_editor(
         data_df,
         column_config={
             "apps": st.column_config.ImageColumn(
