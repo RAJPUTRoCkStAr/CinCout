@@ -62,84 +62,7 @@ def add_data_db(df_visitor_details):
 
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
-# def attendance(id, name):
-#     f_p = os.path.join(VISITOR_HISTORY, file_history)
-#     # st.write(f_p)
 
-#     now = datetime.datetime.now()
-#     dtString = now.strftime('%Y-%m-%d %H:%M:%S')
-#     df_attendace_temp = pd.DataFrame(data={ "id"            : [id],
-#                                             "visitor_name"  : [name],
-#                                             "Timing"        : [dtString]
-#                                             })
-
-#     if not os.path.isfile(f_p):
-#         df_attendace_temp.to_csv(f_p, index=False)
-#         # st.write(df_attendace_temp)
-#     else:
-#         df_attendace = pd.read_csv(f_p)
-#         df_attendace = pd.concat([df_attendace,df_attendace_temp])
-#         df_attendace.to_csv(f_p, index=False)
-# ############################################################################
-# # for Viewing attendace
-# def view_attendace():
-#     f_p = os.path.join(VISITOR_HISTORY, file_history)
-#     # st.write(f_p)
-#     df_attendace_temp = pd.DataFrame(columns=["id",
-#                                               "visitor_name", "Timing"])
-
-#     if not os.path.isfile(f_p):
-#         df_attendace_temp.to_csv(f_p, index=False)
-#     else:
-#         df_attendace_temp = pd.read_csv(f_p)
-
-#     df_attendace = df_attendace_temp.sort_values(by='Timing',
-#                                                  ascending=False)
-#     df_attendace.reset_index(inplace=True, drop=True)
-
-#     wonan=st.dataframe(df_attendace,use_container_width=True)
-
-#     if df_attendace.shape[0]>0:
-#         id_chk  = df_attendace.loc[0, 'id']
-#         id_name = df_attendace.loc[0, 'visitor_name']
-
-#         # selected_img = st.selectbox('Search Image using ID',
-#         #                             options=['None']+list(df_attendace['id']))
-
-#         avail_files = [file for file in list(os.listdir(VISITOR_HISTORY))
-#                        if ((file.endswith(tuple(allowed_image_type))) &
-#                         (file.startswith(id_chk) == True))]
-
-#         if len(avail_files)>0:
-#             selected_img_path = os.path.join(VISITOR_HISTORY,
-#                                              avail_files[0])
-#             st.image(Image.open(selected_img_path))
-
-#             wonan.append()
-#                 data_df = pd.DataFrame(
-#     {
-#         "apps": [
-#             "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/5435b8cb-6c6c-490b-9608-799b543655d3/Home_Page.png",
-#             "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/ef9a7627-13f2-47e5-8f65-3f69bb38a5c2/Home_Page.png",
-#             "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/31b99099-8eae-4ff8-aa89-042895ed3843/Home_Page.png",
-#             "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/6a399b09-241e-4ae7-a31f-7640dc1d181e/Home_Page.png",
-#         ],
-#     }
-# )
-
-# st.data_editor(
-#     data_df,
-#     column_config={
-#         "apps": st.column_config.ImageColumn(
-#             "Preview Image", help="Streamlit app preview screenshots"
-#         )
-#     },
-#     hide_index=True,
-# )
-#         #     st.data_editor(wonan,column_config={
-#         #     "Image Preview":st.column_config.ImageColumn("Preview Image")
-#         # },hide_index=True,use_container_width=True,width=800,height=700,column_order=['id','visitor_name','Visitor_image','Timing'])
-###################################################### 
 def attendance(id, name):
     f_p = os.path.join(VISITOR_HISTORY, file_history)
     # st.write(f_p)
@@ -228,17 +151,21 @@ def crop_image_with_ratio(img, height,width,middle):
 
 
 ###################### Defining Static Paths ###################4
-def clearthing():
-    ## Clearing Visitor Database
+def cleardatabase():
     shutil.rmtree(VISITOR_DB, ignore_errors=True)
     os.mkdir(VISITOR_DB)
-    ## Clearing Visitor History
-    shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
-    os.mkdir(VISITOR_HISTORY)
+    # ## Clearing Visitor History
+    # shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
+    # os.mkdir(VISITOR_HISTORY)
     
     if not os.path.exists(VISITOR_DB):
         os.mkdir(VISITOR_DB)
     
+    # if not os.path.exists(VISITOR_HISTORY):
+    #     os.mkdir(VISITOR_HISTORY)
+def clearrecenthistory():
+    shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
+    os.mkdir(VISITOR_HISTORY)
     if not os.path.exists(VISITOR_HISTORY):
         os.mkdir(VISITOR_HISTORY)
 # st.write(VISITOR_HISTORY)
@@ -281,7 +208,6 @@ def Takeattendance():
                         can.append(idx)
                     else:
                         spoofs.append("FAKE")
-                print(can)
                 #this is to show if the image is real or not
             for idx,  (left,top, right, bottom) in enumerate(boxes_int):
                 rois.append(image_array[top:bottom, left:right].copy())
@@ -348,6 +274,8 @@ def Takeattendance():
                                 attendance(visitor_id, 'Unknown')
                     if flag_show == True:
                         st.image(BGR_to_RGB(image_array_copy), width=720)
+                        tts("Attendance Marked succesfully")
+                        st.success("Attendance Marked succesfully")
             else:
                 tts('No human face detected.')
                 st.error('No human face detected.')
