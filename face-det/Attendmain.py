@@ -13,6 +13,11 @@ from test import test
 import torch
 import datetime
 from utils import tts
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from dotenv import load_dotenv
+load_dotenv()
 #######################################################
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -281,45 +286,87 @@ def Takeattendance():
                 st.error('No human face detected.')
 ####################################################################################
 # For adding person
+def send_email(recipient_email, subject, body):
+    sender_email = os.getenv('SMTP_USERNAME')
+    sender_password = os.getenv('SMTP_PASSWORD')
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)  # Replace with your SMTP server and port
+        server.starttls()
+        server.login(sender_email, sender_password)
+        text = msg.as_string()
+        server.sendmail(sender_email, recipient_email, text)
+        server.quit()
+        st.success(f"Unique ID sent to {recipient_email}")
+    except Exception as e:
+        st.error(f"Failed to send email: {str(e)}")
+
 def personadder():
-    face_name  = st.text_input('Name:','')
+    face_name = st.text_input('Name:', '')
+    email = st.text_input('Email:', '')
+
+    # Initialize img_file_buffer
+    img_file_buffer = None
+
     pic_option = st.selectbox('Upload Picture',
-                            options=["Upload your Profile Picture",
-                                     "Take a Picture with Cam"],index=None)
+                              options=["Upload your Profile Picture", "Take a Picture with Cam"], index=None)
+
     if pic_option == 'Upload your Profile Picture':
-        img_file_buffer = st.file_uploader('Upload a Picture',
-                                             type=allowed_image_type)
+        img_file_buffer = st.file_uploader('Upload a Picture', type=allowed_image_type)
         if img_file_buffer is not None:
-            file_bytes = np.asarray(bytearray(img_file_buffer.read()),
-                                    dtype=np.uint8)
+            file_bytes = np.asarray(bytearray(img_file_buffer.read()), dtype=np.uint8)
+
     elif pic_option == 'Take a Picture with Cam':
         img_file_buffer = st.camera_input("Take a Picture with Cam")
         if img_file_buffer is not None:
-            file_bytes = np.frombuffer(img_file_buffer.getvalue(),
-                                       np.uint8)
- 
-        if ((img_file_buffer is not None) & (len(face_name) > 1) &
-            st.button('Image Preview',use_container_width=True)):
-            tts("Previewing image")
-            st.subheader("Image Preview")
-            st.image(img_file_buffer)
- 
-        if ((img_file_buffer is not None) & (len(face_name) > 1) &
-                st.button('Click to Save!',use_container_width=True)):
-            image_array = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-            with open(os.path.join(VISITOR_DB,
-                                   f'{face_name}.jpg'), 'wb') as file:
-                file.write(img_file_buffer.getbuffer())
-                # st.success('Image Saved Successfully!')
-            face_locations ,prob = mtcnn(image_array,return_prob=True)
-            torch_loc = torch.stack([face_locations[0]]).to(device)
-            encodesCurFrame = resnet(torch_loc).detach().cpu()
-            df_new = pd.DataFrame(data=encodesCurFrame,
-                                  columns=COLS_ENCODE)
-            df_new[COLS_INFO] = face_name
-            df_new = df_new[COLS_INFO + COLS_ENCODE].copy()
-            # st.write(df_new)
-            # initial database for known faces
-            DB = initialize_data()
-            add_data_db(df_new)
-####    ##################################################
+            file_bytes = np.frombuffer(img_file_buffer.getvalue(), np.uint8)
+
+    if ((img_file_buffer is not None) & (len(face_name) > 1) & st.button('Image Preview', use_container_width=True)):
+        tts("Previewing image")
+        st.subheader("Image Preview")
+        st.image(img_file_buffer)
+
+    if ((img_file_buffer is not None) & (len(face_name) > 1) & (len(email) > 1) & st.button('Click to Save!', use_container_width=True)):
+        unique_id = str(uuid.uuid4())
+        image_array = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+        if image_array is None:
+            st.error("Error loading the image. Please try again.")
+            return
+
+        with open(os.path.join(VISITOR_DB, f'{face_name}_{unique_id}.jpg'), 'wb') as file:
+            file.write(img_file_buffer.getbuffer())
+
+        # Convert image to RGB before face detection
+        image_array_rgb = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
+        face_locations, prob = mtcnn(image_array_rgb, return_prob=True)
+
+        if face_locations is None or len(face_locations) == 0:
+            st.error("No faces detected in the image. Please try again.")
+            st.write("Debugging Info:")
+            st.write(f"Image shape: {image_array.shape}")
+            st.write(f"Face locations: {face_locations}")
+            return
+
+        torch_loc = torch.stack([face_locations[0]]).to(device)
+        encodesCurFrame = resnet(torch_loc).detach().cpu()
+
+        df_new = pd.DataFrame(data=encodesCurFrame, columns=COLS_ENCODE)
+        df_new[COLS_INFO] = face_name
+        df_new['Unique_ID'] = unique_id  # Add the unique ID to the DataFrame
+        df_new = df_new[['Unique_ID'] + COLS_INFO + COLS_ENCODE].copy()
+
+        DB = initialize_data()
+        add_data_db(df_new)
+
+        # Send email with unique ID
+        email_body = f"Hello {face_name},\n\nYour unique ID is: {unique_id}\n\nBest regards,\nTeam"
+        send_email(email, "Your Unique ID", email_body)
+

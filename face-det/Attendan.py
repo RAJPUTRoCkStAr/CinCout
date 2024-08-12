@@ -1,3 +1,3 @@
 from Attendmain import Takeattendance
-def att():
+def atten():
     Takeattendance()

@@ -3,7 +3,7 @@ from streamlit_option_menu import option_menu
 from utils import title,contact,login,signup
 from dash import dashboard
 from Home import home
-from e import att
+from Attendan import atten
 title()
 
 if 'logged_in' not in st.session_state:
@@ -20,7 +20,7 @@ else:
     if st.session_state.page == "Home":
         home()
     if st.session_state.page == "Attendance":
-        att()
+        atten()
 
     elif st.session_state.page == "Sign Up":
         selected = st.sidebar.selectbox("Select Institution", ["School", "University", "Hospital", 'Office'])
