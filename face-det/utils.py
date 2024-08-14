@@ -548,50 +548,6 @@ def contact():
                 tts("Please enter a valid email address.")
             else:
                 send_contact_email(name, email, subject, message)
-
-def send_contact_email(name, email, subject, message):
-    try:
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
-        recipient_email = "luciferdevil565656@gmail.com"  # Replace with your contact email address
-
-        mail_content = f"""
-        <html>
-        <body>
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h1 style="color: #1a73e8;">Contact Us Message</h1>
-                <p><strong>Name:</strong> {name}</p>
-                <p><strong>Email:</strong> {email}</p>
-                <p><strong>Subject:</strong> {subject}</p>
-                <p><strong>Message:</strong></p>
-                <p>{message}</p>
-                <p>Best regards,<br>{name}</p>
-            </div>
-        </body>
-        </html>
-        """
-
-        message_obj = MIMEMultipart()
-        message_obj['From'] = smtp_username
-        message_obj['To'] = recipient_email
-        message_obj['Subject'] = subject
-
-        message_obj.attach(MIMEText(mail_content, 'html'))
-
-        # Send the email
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(message_obj)
-
-        tts("Thank you for contacting us! Your message has been sent successfully.")
-        st.success("Thank you for contacting us! Your message has been sent successfully.")
-
-    except Exception as e:
-        tts(f"Failed to send email: {e}")
-        st.error(f"Failed to send email: {e}")
       
     select = option_menu("MEET OUR TEAM", 
         ['Team','Individual'],
@@ -665,3 +621,46 @@ def send_contact_email(name, email, subject, message):
         hide_index=True,
         use_container_width=True
     )
+def send_contact_email(name, email, subject, message):
+    try:
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587
+        smtp_username = os.getenv('SMTP_USERNAME')
+        smtp_password = os.getenv('SMTP_PASSWORD')
+        recipient_email = "luciferdevil565656@gmail.com"  # Replace with your contact email address
+
+        mail_content = f"""
+        <html>
+        <body>
+            <div style="font-family: Arial, sans-serif; color: #333;">
+                <h1 style="color: #1a73e8;">Contact Us Message</h1>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Email:</strong> {email}</p>
+                <p><strong>Subject:</strong> {subject}</p>
+                <p><strong>Message:</strong></p>
+                <p>{message}</p>
+                <p>Best regards,<br>{name}</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        message_obj = MIMEMultipart()
+        message_obj['From'] = smtp_username
+        message_obj['To'] = recipient_email
+        message_obj['Subject'] = subject
+
+        message_obj.attach(MIMEText(mail_content, 'html'))
+
+        # Send the email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(message_obj)
+
+        tts("Thank you for contacting us! Your message has been sent successfully.")
+        st.success("Thank you for contacting us! Your message has been sent successfully.")
+
+    except Exception as e:
+        tts(f"Failed to send email: {e}")
+        st.error(f"Failed to send email: {e}")
