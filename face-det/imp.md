@@ -1,5 +1,6 @@
-#######################################################
-import uuid ## random id generator
+################################################################
+#importing everything
+import uuid
 from streamlit_option_menu import option_menu
 import streamlit as st
 import os
@@ -9,18 +10,23 @@ import numpy as np
 import pandas as pd
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from PIL import Image, ImageDraw
-from test import test
 import torch
 import datetime
+import re
 import base64
 from utils import tts
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
+import sqlite3
+import random
+import string
 load_dotenv()
-#######################################################
-
+#################################################################################
+#################################################################################
+# getting some common variable
+allowed_image_type = ['.png', 'jpg', '.jpeg']
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 VISITOR_DB = os.path.join(ROOT_DIR, "visitor_database")
 VISITOR_HISTORY = os.path.join(ROOT_DIR, "visitor_history")
@@ -28,158 +34,194 @@ COLOR_DARK  = (0, 0, 153)
 COLOR_WHITE = (255, 255, 255)
 COLS_INFO   = ['Name']
 COLS_ENCODE = [f'v{i}' for i in range(512)]
-## Database
-data_path       = VISITOR_DB
-file_db         = 'visitors_db.csv'         ## To store user information
-file_history    = 'visitors_history.csv'    ## To store visitor history information
-
-## Image formats allowed
-allowed_image_type = ['.png', 'jpg', '.jpeg']
-def initialize_data():
-    if os.path.exists(os.path.join(data_path, file_db)):
-        # st.info('Database Found!')
-        df = pd.read_csv(os.path.join(data_path, file_db))
-
-    else:
-        # st.info('Database Not Found!')
-        df = pd.DataFrame(columns=COLS_INFO + COLS_ENCODE)
-        df.to_csv(os.path.join(data_path, file_db), index=False)
-
-    return df
-
-def add_data_db(df_visitor_details):
-    try:
-        df_all = pd.read_csv(os.path.join(data_path, file_db))
-
-        if not df_all.empty:
-            df_all = pd.concat([df_all,df_visitor_details], ignore_index=False)
-            df_all.drop_duplicates(keep='first', inplace=True)
-            df_all.reset_index(inplace=True, drop=True)
-            df_all.to_csv(os.path.join(data_path, file_db), index=False)
-            tts('Details Added Successfully!')
-            st.success('Details Added Successfully!')
-        else:
-            df_visitor_details.to_csv(os.path.join(data_path, file_db), index=False)
-            tts('Initiated Data Successfully!')
-            st.success('Initiated Data Successfully!')
-
-    except Exception as e:
-        st.error(e)
-
+DB_PATH     = os.path.join(ROOT_DIR, "users.db")
+################################################################################
+################################################################################
+#some functions for attendance
+def generate_10_digit_id():
+    uuid_int = uuid.uuid4().int
+    alphanumeric_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    numeric_part = str(uuid_int % 1000000).zfill(4)
+    return alphanumeric_id + numeric_part
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
+################################################################################
+## Database init
+def initialize_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS visitors (
+        Unique_ID TEXT PRIMARY KEY,
+        Name TEXT NOT NULL,
+        Email TEXT NOT NULL,
+        {columns}
+    )
+    '''.format(columns=', '.join(f'{col} REAL' for col in COLS_ENCODE)))
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS attendance (
+        ID TEXT,
+        visitor_name TEXT,
+        Timing TEXT,
+        Image_Path TEXT
+    )
+    ''')
+    conn.commit()
+    conn.close()
+############################################################################
+## making of function
+def add_data_db(visitor_details):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
 
-def attendance(id, name):
-    f_p = os.path.join(VISITOR_HISTORY, file_history)
-    # st.write(f_p)
+    for _, row in visitor_details.iterrows():
+        cursor.execute('''
+        INSERT OR REPLACE INTO visitors (Unique_ID, Name, Email, {columns})
+        VALUES (?, ?, ?, {placeholders})
+        '''.format(columns=', '.join(COLS_ENCODE),
+                   placeholders=', '.join('?' * len(COLS_ENCODE))),
+                   (row['Unique_ID'], row['Name'], row['Email'], *row[COLS_ENCODE]))
 
+    conn.commit()
+    conn.close()
+    tts('Details Added Successfully!')
+    st.success('Details Added Successfully!')
+
+def get_data_from_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+    SELECT * FROM visitors
+    ''')
+    data = cursor.fetchall()
+    conn.close()
+    
+    df = pd.DataFrame(data, columns=['Unique_ID', 'Name'] + COLS_ENCODE)
+    return df
+def is_gmail(email):
+    """Check if the email address is a Gmail address."""
+    return email.lower().endswith('@gmail.com')
+
+def is_email_registered(email):
+    """Check if the email is already registered in the database."""
+    conn = sqlite3.connect(DB_PATH)
+    query = "SELECT COUNT(*) FROM visitors WHERE Email = ?"
+    cursor = conn.cursor()
+    cursor.execute(query, (email,))
+    count = cursor.fetchone()[0]
+    conn.close()
+    return count > 0
+def add_attendance(id, name):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
     now = datetime.datetime.now()
     dtString = now.strftime('%Y-%m-%d %H:%M:%S')
-    df_attendace_temp = pd.DataFrame(data={ "id"            : [id],
-                                            "visitor_name"  : [name],
-                                            "Timing"        : [dtString]
-                                            })
+    cursor.execute('''
+    INSERT INTO attendance (ID, visitor_name, Timing, Image_Path)
+    VALUES (?, ?, ?, ?)
+    ''', (id, name, dtString, f'{id}.jpg'))
+    
+    conn.commit()
+    conn.close()
 
-    if not os.path.isfile(f_p):
-        df_attendace_temp.to_csv(f_p, index=False)
-        # st.write(df_attendace_temp)
-    else:
-        df_attendace = pd.read_csv(f_p)
-        df_attendace = pd.concat([df_attendace,df_attendace_temp])
-        df_attendace.to_csv(f_p, index=False)
-###########################################################################
-def crop_image_with_ratio(img, height,width,middle):
+def get_attendance_records():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+    SELECT * FROM attendance
+    ''')
+    data = cursor.fetchall()
+    conn.close()
+    
+    df = pd.DataFrame(data, columns=['ID', 'visitor_name', 'Timing', 'Image_Path'])
+    return df
+
+def crop_image_with_ratio(img, height, width, middle):
     h, w = img.shape[:2]
-    h=h-h%4
-    new_w = int(h / height)*width
-    startx = middle - new_w //2
-    endx=middle+new_w //2
-    if startx<=0:
+    h = h - h % 4
+    new_w = int(h / height) * width
+    startx = middle - new_w // 2
+    endx = middle + new_w // 2
+    if startx <= 0:
         cropped_img = img[0:h, 0:new_w]
-    elif endx>=w:
+    elif endx >= w:
         cropped_img = img[0:h, w-new_w:w]
     else:
         cropped_img = img[0:h, startx:endx]
     return cropped_img
-
-################################################### Defining Static Data ###############################################
-
-
-
-###################### Defining Static Paths ###################4
+def connect_db(db_path=DB_PATH):
+    conn = sqlite3.connect(db_path)
+    return conn
+##############################################################################
 def cleardatabase():
-    shutil.rmtree(VISITOR_DB, ignore_errors=True)
-    os.mkdir(VISITOR_DB)
-    # ## Clearing Visitor History
-    # shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
-    # os.mkdir(VISITOR_HISTORY)
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM visitors")
     
+    conn.commit()
+    conn.close()
+    
+    tts('Visitor database cleared successfully!')
+    st.success('Visitor database cleared successfully!')
+
     if not os.path.exists(VISITOR_DB):
         os.mkdir(VISITOR_DB)
     
-    # if not os.path.exists(VISITOR_HISTORY):
-    #     os.mkdir(VISITOR_HISTORY)
 def clearrecenthistory():
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    # Clear all entries from the attendance table
+    cursor.execute("DELETE FROM attendance")
+    
+    conn.commit()
+    conn.close()
+    
+    # Optionally, remove the image history
     shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
     os.mkdir(VISITOR_HISTORY)
-    if not os.path.exists(VISITOR_HISTORY):
-        os.mkdir(VISITOR_HISTORY)
-# st.write(VISITOR_HISTORY)
+    
+    tts('Recent history cleared successfully!')
+    st.success('Recent history cleared successfully!')
+##############################################################################
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN(
         image_size=160, margin=0, min_face_size=20,
         thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
-        device=device,keep_all=True
+        device=device, keep_all=True
         )
-# View Attendance
+#############################################################################
+## Imoptant function
 def view_attendance():
-    f_p = os.path.join(VISITOR_HISTORY, file_history)
+    st.write("### Attendance Records")
     
-    # Check if the attendance file exists
-    if not os.path.isfile(f_p):
-        st.warning(f"No attendance record found at {f_p}")
+    df_combined = get_attendance_records()
+    
+    if df_combined.empty:
+        st.warning("No attendance records found.")
         return
     
-    # Load attendance data
-    df_attendance_temp = pd.DataFrame(columns=["id", "visitor_name", "Timing"])
-    try:
-        df_attendance_temp = pd.read_csv(f_p)
-    except Exception as e:
-        st.error(f"Error loading attendance data: {e}")
-        return
-
-    # Sort and reset index
-    df_attendance = df_attendance_temp.sort_values(by='Timing', ascending=False)
-    df_attendance.reset_index(inplace=True, drop=True)
-
-    # Add a column for image file paths
-    image_paths = []
-    for idx, row in df_attendance.iterrows():
-        image_path = None
-        files = [file for file in os.listdir(VISITOR_HISTORY)
-                 if file.endswith(tuple(allowed_image_type)) and file.startswith(str(row['id']))]
-        if files:
-            image_path = os.path.join(VISITOR_HISTORY, files[0])
-        image_paths.append(image_path)
+    df_combined.sort_values(by='Timing', ascending=False, inplace=True)
+    df_combined.reset_index(drop=True, inplace=True)
     
-    df_attendance['image_path'] = image_paths
-
-    # Function to encode images for display
     def encode_image(image_path):
-        if image_path and os.path.isfile(image_path):
-            with open(image_path, "rb") as image_file:
+        full_image_path = os.path.join(VISITOR_HISTORY, image_path)
+        if image_path and os.path.isfile(full_image_path):
+            with open(full_image_path, "rb") as image_file:
                 return "data:image/jpeg;base64," + base64.b64encode(image_file.read()).decode()
         return None
     
-    df_attendance['image'] = df_attendance['image_path'].apply(encode_image)
-
-    # Display DataFrame with images
+    df_combined['image'] = df_combined['Image_Path'].apply(encode_image)
+    
     try:
         st.data_editor(
-            df_attendance.drop(columns=["image_path"]),
+            df_combined.drop(columns=["Image_Path"]),
             column_config={
-                "id": st.column_config.Column("ID"),
+                "ID": st.column_config.Column("ID"),
                 "visitor_name": st.column_config.Column("Visitor Name"),
                 "Timing": st.column_config.Column("Timing"),
                 "image": st.column_config.ImageColumn(
@@ -192,9 +234,14 @@ def view_attendance():
     except Exception as e:
         st.error(f"Error displaying attendance data: {e}")
 
-# Take Attendance
+#############################################################################
+### take attendance
 def Takeattendance():
-    visitor_id = uuid.uuid1()
+    visitor_id = st.text_input("Enter your Unique ID:", '')
+    if not visitor_id:
+        st.error("Please enter your Unique ID.")
+        return
+    
     img_file_buffer = st.camera_input("Take a picture")
     
     if img_file_buffer is not None:
@@ -207,93 +254,63 @@ def Takeattendance():
             tts('Image Saved Successfully!')
             st.success('Image Saved Successfully!')
             
-            max_faces = 0
-            rois = []
-            aligned = []
-            spoofs = []
-            can = []
+            boxes, probs = mtcnn.detect(image_array, landmarks=False)
             
-            face_locations, prob = mtcnn(image_array, return_prob=True)
-            boxes, _ = mtcnn.detect(image_array)
-            boxes_int = boxes.astype(int) if boxes is not None else []
-            
-            if face_locations is not None:
-                for idx, (left, top, right, bottom) in enumerate(boxes_int):
-                    img = crop_image_with_ratio(image_array, 4, 3, (left + right) // 2)
-                    spoof = test(img, "./resources/anti_spoof_models", device)
-                    if spoof <= 1:
-                        spoofs.append("REAL")
-                        can.append(idx)
-                    else:
-                        spoofs.append("FAKE")
+            if boxes is not None:
+                boxes_int = [[int(box[0]), int(box[1]), int(box[2]), int(box[3])] for box in boxes]
+                aligned = []
+                rois = []  
                 
-                for idx, (left, top, right, bottom) in enumerate(boxes_int):
-                    rois.append(image_array[top:bottom, left:right].copy())
-                    cv2.rectangle(image_array, (left, top), (right, bottom), COLOR_DARK, 2)
-                    cv2.rectangle(image_array, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
-                    font = cv2.FONT_HERSHEY_DUPLEX
-                    cv2.putText(image_array, f"#{idx} {spoofs[idx]}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
-                
-                if len(boxes_int) > 0:
-                    col1, col2 = st.columns(2)
-                    face_idxs = col1.multiselect("Select face#", can, default=can)
-                    similarity_threshold = col2.slider('Select Threshold for Similarity', min_value=0.0, max_value=3.0, value=0.5)
+                for box in boxes:
+                    face = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
+                    aligned_face = mtcnn(face)
                     
-                    flag_show = False
-                    if st.button("Mark Attendance") and (len(face_idxs) > 0):
-                        dataframe_new = pd.DataFrame()
-                        for idx, loc in enumerate(face_locations):
-                            torch_loc = torch.stack([loc]).to(device)
-                            encodesCurFrame = resnet(torch_loc).detach().cpu()
-                            aligned.append(encodesCurFrame)
+                    if aligned_face is not None:
+                        encodesCurFrame = resnet(aligned_face.to(device)).detach().cpu()
+                        aligned.append(encodesCurFrame)
                         
-                        for face_idx in face_idxs:
-                            database_data = initialize_data()
-                            face_encodings = database_data[COLS_ENCODE].values
-                            dataframe = database_data[COLS_INFO]
+                if len(aligned) > 0:
+                    similarity_threshold = st.slider('Select Threshold for Similarity', min_value=0.0, max_value=3.0, value=0.5)
+                    
+                    for face_idx in range(len(aligned)):
+                        database_data = get_data_from_db()
+                        face_encodings = database_data[COLS_ENCODE].values
+                        dataframe = database_data[COLS_INFO]
+                        
+                        face_to_compare = aligned[face_idx].numpy()
+                        
+                        similarity = np.dot(face_encodings, face_to_compare.T)
+                        matches = similarity > similarity_threshold
+                        
+                        if matches.any():
+                            idx = np.argmax(similarity[matches])
+                            dataframe_new = dataframe.iloc[idx]
+                            name_visitor = dataframe_new['Name']
+                            add_attendance(visitor_id, name_visitor)
+                            flag_show = True
                             
-                            if len(aligned) < 1:
-                                tts(f'Please Try Again for face#{face_idx}!')
-                                st.error(f'Please Try Again for face#{face_idx}!')
-                            else:
-                                face_to_compare = aligned[face_idx].numpy()
-                                dataframe['similarity'] = [np.linalg.norm(e1 - face_to_compare) for e1 in face_encodings]
-                                dataframe['similarity'] = dataframe['similarity'].astype(float)
-                                dataframe_new = dataframe.drop_duplicates(keep='first')
-                                dataframe_new.reset_index(drop=True, inplace=True)
-                                dataframe_new.sort_values(by="similarity", ascending=True, inplace=True)
-                                dataframe_new = dataframe_new[dataframe_new['similarity'] < similarity_threshold].head(1)
-                                dataframe_new.reset_index(drop=True, inplace=True)
-                                
-                                # Debugging: Check the columns of dataframe_new
-                                st.write("Columns in dataframe_new:", dataframe_new.columns)
-                                
-                                if dataframe_new.shape[0] > 0:
-                                    (left, top, right, bottom) = (boxes_int[face_idx])
-                                    rois.append(image_array_copy[top:bottom, left:right].copy())
-                                    cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
-                                    cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
-                                    font = cv2.FONT_HERSHEY_DUPLEX
-                                    cv2.putText(image_array_copy, f"#{dataframe_new.loc[0, 'Name']}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
-                                    name_visitor = dataframe_new.loc[0, 'Name']
-                                    attendance(visitor_id, name_visitor)
-                                    flag_show = True
-                                else:
-                                    tts(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
-                                    st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
-                                    st.info('Please Update the database for a new person or click again!')
-                                    tts('Please Update the database for a new person or click again!')
-                                    attendance(visitor_id, 'Unknown')
-                        
-                        if flag_show:
-                            st.image(BGR_to_RGB(image_array_copy), width=720)
-                            tts("Attendance Marked successfully")
-                            st.success("Attendance Marked successfully")
-                else:
-                    tts('No human face detected.')
-                    st.error('No human face detected.')
-
-# Add Person
+                            (left, top, right, bottom) = (boxes_int[face_idx])
+                            rois.append(image_array_copy[top:bottom, left:right].copy())
+                            cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
+                            cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
+                            font = cv2.FONT_HERSHEY_DUPLEX
+                            cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
+                        else:
+                            tts('No Match Found for the given Similarity Threshold!')
+                            st.error('No Match Found for the given Similarity Threshold!')
+                            st.info('Please Update the database for a new person or click again!')
+                            tts('Please Update the database for a new person or click again!')
+                            add_attendance(visitor_id, 'Unknown')
+                
+                if flag_show:
+                    st.image(BGR_to_RGB(image_array_copy), width=720)
+                    tts("Attendance Marked successfully")
+                    st.success("Attendance Marked successfully")
+            else:
+                tts('No human face detected.')
+                st.error('No human face detected.')
+#############################################################################
+## Adding of person with unique id
 def send_email(recipient_email, subject, body):
     sender_email = os.getenv('SMTP_USERNAME')
     sender_password = os.getenv('SMTP_PASSWORD')
@@ -306,22 +323,23 @@ def send_email(recipient_email, subject, body):
     msg.attach(MIMEText(body, 'plain'))
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)  # Replace with your SMTP server and port
-        server.starttls()
-        server.login(sender_email, sender_password)
-        text = msg.as_string()
-        server.sendmail(sender_email, recipient_email, text)
-        server.quit()
-        st.success(f"Unique ID sent to {recipient_email}")
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as server:  # Set a timeout
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+            st.success(f"Unique ID sent to {recipient_email}")
+    except smtplib.SMTPException as e:
+        st.error(f"SMTP error occurred: {str(e)}")
     except Exception as e:
-        st.error(f"Failed to send email: {str(e)}")
+        st.error(f"An error occurred: {str(e)}")
 
 def personadder():
     face_name = st.text_input('Name:', '')
     email = st.text_input('Email:', '')
     img_file_buffer = None
 
-    pic_option = st.selectbox('Upload Picture', options=["Upload your Profile Picture", "Take a Picture with Cam"], index=None)
+    pic_option = st.selectbox('Upload Picture',
+                              options=["Upload your Profile Picture", "Take a Picture with Cam"], index=None)
 
     if pic_option == 'Upload your Profile Picture':
         img_file_buffer = st.file_uploader('Upload a Picture', type=allowed_image_type)
@@ -333,13 +351,21 @@ def personadder():
         if img_file_buffer is not None:
             file_bytes = np.frombuffer(img_file_buffer.getvalue(), np.uint8)
 
-    if img_file_buffer is not None and len(face_name) > 1 and st.button('Image Preview', use_container_width=True):
+    if ((img_file_buffer is not None) & (len(face_name) > 1) & st.button('Image Preview', use_container_width=True)):
         tts("Previewing image")
         st.subheader("Image Preview")
         st.image(img_file_buffer)
 
-    if img_file_buffer is not None and len(face_name) > 1 and len(email) > 1 and st.button('Click to Save!', use_container_width=True):
-        unique_id = str(uuid.uuid4())
+    if ((img_file_buffer is not None) & (len(face_name) > 1) & (len(email) > 1) & st.button('Click to Save!', use_container_width=True)):
+        if not is_gmail(email):
+            st.error("Please enter a valid Gmail address.")
+            return
+
+        if is_email_registered(email):
+            st.error("This email is already registered. Please use a different email.")
+            return
+
+        unique_id = generate_10_digit_id()
         image_array = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
         if image_array is None:
@@ -362,46 +388,85 @@ def personadder():
         encodesCurFrame = resnet(torch_loc).detach().cpu()
 
         df_new = pd.DataFrame(data=encodesCurFrame, columns=COLS_ENCODE)
-        df_new[COLS_INFO] = face_name
+        df_new['Name'] = face_name
         df_new['Unique_ID'] = unique_id
-        df_new = df_new[['Unique_ID'] + COLS_INFO + COLS_ENCODE].copy()
+        df_new['Email'] = email  # Ensure this line is present
+        df_new = df_new[['Unique_ID'] + ['Name'] + ['Email'] + COLS_ENCODE].copy()
 
-        DB = initialize_data()
+        # Adding email to database
+        df_new['Email'] = email
         add_data_db(df_new)
         email_body = f"Hello {face_name},\n\nYour unique ID is: {unique_id}\n\nBest regards,\nTeam"
         send_email(email, "Your Unique ID", email_body)
-
-# View Attendance by Unique ID
-def view_attendance_by_id(unique_id):
-    file_path = os.path.join(VISITOR_HISTORY, f"{unique_id}.csv")
-    if not os.path.isfile(file_path):
-        st.error("No attendance history found for this Unique ID.")
-        return
+##############################################################################
+## Searching of attendance using unique id
+def search_attendance():
+    st.header("Search Attendance Records")
     
-    df_attendance = pd.read_csv(file_path)
-    if df_attendance.empty:
-        st.error("No records found.")
-        return
-    
-    df_attendance = df_attendance.sort_values(by='Timing', ascending=False)
-    df_attendance.reset_index(inplace=True, drop=True)
-    
-    # Display DataFrame
-    st.write(df_attendance)
+    search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
+    search_input = st.text_input(f"Enter {search_type} to search:", '')
 
-# Streamlit UI
-st.title("Visitor Management System")
+    if search_input:
+        df_combined = get_attendance_records()
+        
+        if search_type == "Visitor ID":
+            search_results = df_combined[df_combined['ID'] == search_input]
+        else:
+            search_results = df_combined[df_combined['visitor_name'].str.contains(search_input, case=False, na=False)]
+        
+        if not search_results.empty:
+            st.write("### Search Results")
+            
+            def encode_image(image_path):
+                full_image_path = os.path.join(VISITOR_HISTORY, image_path)
+                if os.path.isfile(full_image_path):
+                    with open(full_image_path, "rb") as image_file:
+                        return "data:image/jpeg;base64," + base64.b64encode(image_file.read()).decode()
+                return None
 
-# Sidebar options
-option = st.sidebar.selectbox("Select an action", ["Add Person", "Take Attendance", "View Attendance", "View My Attendance"])
+            search_results['image'] = search_results['Image_Path'].apply(encode_image)
 
-if option == "Add Person":
-    personadder()
-elif option == "Take Attendance":
+            try:
+                st.data_editor(
+                    search_results.drop(columns=["Image_Path"]),
+                    column_config={
+                        "ID": st.column_config.Column("ID"),
+                        "visitor_name": st.column_config.Column("Visitor Name"),
+                        "Timing": st.column_config.Column("Timing"),
+                        "image": st.column_config.ImageColumn(
+                            "Visitor Image", help="Preview of visitor images"
+                        )
+                    },
+                    hide_index=True,
+                    use_container_width=True
+                )
+            except Exception as e:
+                st.error(f"Error displaying search results: {e}")
+        else:
+            st.warning(f"No records found for {search_type}: {search_input}")
+
+
+initialize_db()
+
+
+with st.sidebar:
+    selection = option_menu("Main Menu", 
+                            ["Take Attendance", "Add Person", "View Attendance", "Search Attendance", 
+                             "Clear Database", "Clear Recent History"], 
+                            icons=["camera", "person-add", "clipboard-data", "search", 
+                                   "trash", "clock-history"], 
+                            menu_icon="cast", 
+                            default_index=0)
+
+if selection == "Take Attendance":
     Takeattendance()
-elif option == "View Attendance":
+elif selection == "Add Person":
+    personadder()
+elif selection == "View Attendance":
     view_attendance()
-elif option == "View My Attendance":
-    unique_id_input = st.text_input('Enter your Unique ID to view attendance:', '')
-    if unique_id_input and st.button('View Attendance'):
-        view_attendance_by_id(unique_id_input)
+elif selection == "Search Attendance":
+    search_attendance()  # Adding the search function here
+elif selection == "Clear Database":
+    cleardatabase()
+elif selection == "Clear Recent History":
+    clearrecenthistory()
