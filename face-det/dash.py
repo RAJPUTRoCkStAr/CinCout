@@ -15,15 +15,16 @@ def dashboard():
         c = conn.cursor()
         username = st.session_state.username
         name = extract_name(username)
-        c.execute('SELECT email, job_role, password FROM users WHERE username = ?', (username,))
+        c.execute('SELECT email, job_role, password,item FROM users WHERE username = ?', (username,))
         user_data = c.fetchone()
         if user_data:
-            email, job_role, current_password = user_data
+            email, job_role, current_password,work_plac = user_data
             st.header(f"Welcome, {name}!")
             st.subheader("Your Profile Information")
             st.write(f"**Username:** {username}")
             st.write(f"**Email:** {email}")
             st.write(f"**Job Role:** {job_role}")
+            st.write(f"**Workplace:** {work_plac}")
         else:
             st.error("User data not found.")
             tts("User data not found.")

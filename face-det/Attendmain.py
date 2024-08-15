@@ -180,7 +180,7 @@ def view_registered_persons():
     if df_registered.empty:
         st.warning("No registered persons found.")
         return
-    df_registered = df_registered[['Unique_ID', 'Name']] 
+    df_registered = df_registered[['Unique_ID', 'Name','email','category']] 
     st.dataframe(df_registered, use_container_width=True,hide_index=True)
 def view_attendance():
     st.write("### Attendance Records")
@@ -343,8 +343,17 @@ def send_email(recipient_email, subject, body):
     msg['From'] = sender_email
     msg['To'] = recipient_email
     msg['Subject'] = subject
-
-    msg.attach(MIMEText(body, 'plain'))
+    html_body = f"""
+    <html>
+    <body>
+        <h2 style="color: #4CAF50;">Hello {recipient_email.split('@')[0]},</h2>
+        <p style="font-size: 14px; color: #333;">{body}</p>
+        <br>
+        <p style="font-size: 12px; color: #999;">Best regards,<br>Team</p>
+    </body>
+    </html>
+    """
+    msg.attach(MIMEText(html_body, 'html'))
 
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
