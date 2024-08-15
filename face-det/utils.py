@@ -71,7 +71,7 @@ def title():
     st.markdown(html_temp, unsafe_allow_html=True)
 #################################################################################
 #database connection
-conn = sqlite3.connect('users.db')
+conn = sqlite3.connect('data/database.db')
 c = conn.cursor()
 c.execute('''
     CREATE TABLE IF NOT EXISTS users
@@ -88,7 +88,7 @@ conn.commit()
 ##############################################################################
 #sign up
 def signup(item):
-    conn = sqlite3.connect('users.db') 
+    conn = sqlite3.connect('data/database.db') 
     c = conn.cursor()
     st.header(f"Sign Up for {item} Management")
     with st.form(key="signup_form", clear_on_submit=True):
@@ -135,7 +135,7 @@ def signup(item):
 #############################################################################
 #login 
 def login(item):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
 
     st.subheader(f"Log in Here 👇 for {item} Management")
@@ -228,7 +228,7 @@ def send_password_reset_email(email, new_password):
 #####################################################################
 #changer username
 def change_username():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
 
     try:
@@ -307,7 +307,7 @@ def send_username_change_email(email, new_username):
         st.error(f"Failed to send email: {e}")
 
 def change_job_role():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
     
     try:
@@ -385,7 +385,7 @@ def send_job_role_change_email(email, new_job_role):
         st.error(f"Failed to send email: {e}")
 
 def changepass():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
     
     username = st.session_state.username
