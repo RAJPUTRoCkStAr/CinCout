@@ -41,21 +41,15 @@ def initialize_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Define encoding columns for the visitors table
-    encoding_columns = ', '.join(f'{col} REAL' for col in COLS_ENCODE)
-    
-    # Create visitors table
-    cursor.execute(f'''
+    # Create tables if they do not exist
+    cursor.execute('''
     CREATE TABLE IF NOT EXISTS visitors (
         Unique_ID TEXT PRIMARY KEY,
         Name TEXT NOT NULL,
-        Workplace TEXT NOT NULL,
-        Job_role TEXT NOT NULL,
-        {encoding_columns}
+        {columns}
     )
-    ''')
+    '''.format(columns=', '.join(f'{col} REAL' for col in COLS_ENCODE)))
 
-    # Create attendance table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS attendance (
         ID TEXT,
@@ -68,24 +62,22 @@ def initialize_db():
     conn.commit()
     conn.close()
 
-
 def add_data_db(visitor_details):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     for _, row in visitor_details.iterrows():
         cursor.execute('''
-        INSERT OR REPLACE INTO visitors (Unique_ID, Name, Workplace, Job_role, {columns})
-        VALUES (?, ?, ?, ?, {placeholders})
+        INSERT OR REPLACE INTO visitors (Unique_ID, Name, {columns})
+        VALUES (?, ?, {placeholders})
         '''.format(columns=', '.join(COLS_ENCODE),
                    placeholders=', '.join('?' * len(COLS_ENCODE))),
-                   (row['Unique_ID'], row['Name'], row['Workplace'], row['Job_role'], *row[COLS_ENCODE]))
+                   (row['Unique_ID'], row['Name'], *row[COLS_ENCODE]))
     
     conn.commit()
     conn.close()
     tts('Details Added Successfully!')
     st.success('Details Added Successfully!')
-
 
 def get_data_from_db():
     conn = sqlite3.connect(DB_PATH)
@@ -97,7 +89,7 @@ def get_data_from_db():
     data = cursor.fetchall()
     conn.close()
     
-    df = pd.DataFrame(data, columns=['Unique_ID', 'Name','Workplace','job_role'] + COLS_ENCODE)
+    df = pd.DataFrame(data, columns=['Unique_ID', 'Name'] + COLS_ENCODE)
     return df
 
 def add_attendance(id, name):
@@ -220,6 +212,7 @@ def view_attendance():
     except Exception as e:
         st.error(f"Error displaying attendance data: {e}")
 def view_registered_persons():
+    
     df = get_data_from_db()
     
     if df.empty:
@@ -228,8 +221,7 @@ def view_registered_persons():
     
     st.subheader("Registered Persons List")
     
-    st.dataframe(df[['Unique_ID', 'Name', 'Workplace', 'job_role']], use_container_width=True, hide_index=True)
-
+    st.dataframe(df[['Unique_ID', 'Name']],use_container_width=True,hide_index=True)
 def Takeattendance():
     visitor_id = st.text_input("Enter your Unique ID:", '')
     if not visitor_id:
@@ -332,94 +324,6 @@ def send_email(recipient_email, subject, body,unique_id):
 def personadder():
     face_name = st.text_input('Name:', '')
     email = st.text_input('Email:', '')
-
-    # Define job roles for different workplaces
-    roles = {
-        "School": [
-            "Vice Principal/Assistant Principal",
-            "Grade 1 Students",
-            "Grade 2 Students",
-            "Grade 3 Students",
-            "Grade 4 Students",
-            "Grade 5 Students",
-            "Grade 6 Students",
-            "Grade 7 Students",
-            "Grade 8 Students",
-            "Grade 9 Students",
-            "Grade 10 Students",
-            "Grade 11 Students",
-            "Grade 12 Students",
-            "Classroom Teacher",
-            "Special Education Teacher",
-            "Teaching Assistant/Paraprofessional",
-            "Subject Specialist (e.g., Math, Science)",
-            "Extracurricular Activities Coordinator"
-        ],
-        "University": [
-            "Vice President/Chancellor",
-            "Professor",
-            "Associate Professor",
-            "Assistant Professor",
-            "Lecturer",
-            "Teaching Assistant",
-            "Research Scientist",
-            "Postdoctoral Fellow",
-            "Department Chair",
-            "Registrar",
-            "Academic Advisor",
-            "Campus Security Officer",
-            "IT Specialist",
-            "Lab Technician",
-            "Career Services Coordinator",
-            "Library Director",
-            "Facilities Manager"
-        ],
-        "Hospital": [
-            "Administrator",
-            "Physician/Doctor",
-            "Surgeon",
-            "Anesthesiologist",
-            "Registered Nurse",
-            "Nurse Practitioner",
-            "Medical Assistant",
-            "Pharmacist",
-            "Radiologic Technologist",
-            "Lab Technician",
-            "Physical Therapist",
-            "Occupational Therapist",
-            "Billing Specialist",
-            "Patient Care Technician",
-            "Phlebotomist",
-            "Dietitian/Nutritionist",
-            "Housekeeping Staff"
-        ],
-        "Office": [
-            "Office Manager",
-            "Manager",
-            "Assistant",
-            "IT Specialist",
-            "HR Specialist",
-            "Receptionist",
-            "Executive Assistant",
-            "Operations Manager",
-            "Project Manager",
-            "Marketing Manager",
-            "Accountant",
-            "Financial Analyst",
-            "Sales Representative",
-            "Customer Service Representative",
-            "Network Administrator"
-        ]
-    }
-
-    workplace = st.session_state.get('work_place', None)
-
-    if workplace:
-        job_roles = roles.get(workplace, [])
-    else:
-        job_roles = []
-
-    job = st.selectbox("Select your job role", job_roles)
     img_file_buffer = None
 
     pic_option = st.selectbox('Upload Picture',
@@ -441,6 +345,7 @@ def personadder():
         st.image(img_file_buffer)
 
     if ((img_file_buffer is not None) & (len(face_name) > 1) & (len(email) > 1) & st.button('Click to Save!', use_container_width=True)):
+        # Check for unique email
         conn = connect_db()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM visitors WHERE Name=?", (face_name,))
@@ -476,14 +381,11 @@ def personadder():
         df_new = pd.DataFrame(data=encodesCurFrame, columns=COLS_ENCODE)
         df_new['Name'] = face_name
         df_new['Unique_ID'] = unique_id
-        df_new['Workplace'] = workplace
-        df_new['Job_role'] = job
-        df_new = df_new[['Unique_ID'] + ['Name']+['Workplace']+['Job_role'] + COLS_ENCODE].copy()
+        df_new = df_new[['Unique_ID'] + ['Name'] + COLS_ENCODE].copy()
 
         add_data_db(df_new)
-        email_body = f"Hello {face_name} You are working in {workplace} and your role is {job}"
+        email_body = f"Hello {face_name}"
         send_email(email, "Your Unique ID", email_body, unique_id)
-
 def search_attendance():
     st.header("Search Attendance Records")
     
@@ -577,3 +479,6 @@ initialize_db()
 #     cleardatabase()
 # elif selection == "Clear Recent History":
 #     clearrecenthistory()
+
+
+#this is attendance thing
