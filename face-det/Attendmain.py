@@ -17,6 +17,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import sqlite3
+import random,string
 
 load_dotenv()
 allowed_image_type = ['.png', 'jpg', '.jpeg']
@@ -27,10 +28,12 @@ COLOR_DARK  = (0, 0, 153)
 COLOR_WHITE = (255, 255, 255)
 COLS_INFO   = ['Name']
 COLS_ENCODE = [f'v{i}' for i in range(512)]
-DB_PATH     = os.path.join(ROOT_DIR, "visitor_data.db")
+DB_PATH     = os.path.join(ROOT_DIR, "data/database.db")
 def generate_10_digit_id():
     uuid_int = uuid.uuid4().int
-    return str(uuid_int % 10000000000) 
+    alphanumeric_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    numeric_part = str(uuid_int % 1000000).zfill(4)
+    return alphanumeric_id + numeric_part
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
 ## Database
@@ -184,8 +187,9 @@ def view_attendance():
     df_combined.reset_index(drop=True, inplace=True)
     
     def encode_image(image_path):
-        if image_path and os.path.isfile(image_path):
-            with open(image_path, "rb") as image_file:
+        full_image_path = os.path.join(VISITOR_HISTORY, image_path)
+        if image_path and os.path.isfile(full_image_path):
+            with open(full_image_path, "rb") as image_file:
                 return "data:image/jpeg;base64," + base64.b64encode(image_file.read()).decode()
         return None
     
@@ -242,7 +246,7 @@ def Takeattendance():
                         aligned.append(encodesCurFrame)
                         
                 if len(aligned) > 0:
-                    similarity_threshold = st.slider('Select Threshold for Similarity', min_value=0.0, max_value=3.0, value=0.5)
+                    similarity_threshold = 0.5
                     
                     for face_idx in range(len(aligned)):
                         database_data = get_data_from_db()
@@ -293,7 +297,17 @@ def send_email(recipient_email, subject, body):
     msg['To'] = recipient_email
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(body, 'plain'))
+    html_body = f"""
+    <html>
+    <body>
+        <h2 style="color: #4CAF50;">Hello {recipient_email.split('@')[0]},</h2>
+        <p style="font-size: 14px; color: #333;">{body}</p>
+        <br>
+        <p style="font-size: 12px; color: #999;">Best regards,<br>Team</p>
+    </body>
+    </html>
+    """
+    msg.attach(MIMEText(html_body, 'html'))
 
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -381,4 +395,75 @@ def search_attendance():
         else:
             st.warning(f"No records found for {search_type}: {search_input}")
 initialize_db()
+def search_attendance():
+    st.header("Search Attendance Records")
+    
+    search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
+    search_input = st.text_input(f"Enter {search_type} to search:", '')
 
+    searchatt = st.button('Search Attendance',use_container_width=True,type='primary')
+    clearatt = st.button('Clear Recent Attendance',use_container_width=True,type='secondary')
+    if clearatt:
+        clearrecenthistory()
+    if searchatt:
+        df_combined = get_attendance_records()
+        
+        if search_type == "Visitor ID":
+            search_results = df_combined[df_combined['ID'] == search_input]
+        else:
+            search_results = df_combined[df_combined['visitor_name'].str.contains(search_input, case=False, na=False)]
+        
+        if not search_results.empty:
+            st.write("### Search Results")
+            
+            def encode_image(image_path):
+                full_image_path = os.path.join(VISITOR_HISTORY, image_path)
+                if os.path.isfile(full_image_path):
+                    with open(full_image_path, "rb") as image_file:
+                        return "data:image/jpeg;base64," + base64.b64encode(image_file.read()).decode()
+                return None
+
+            search_results['image'] = search_results['Image_Path'].apply(encode_image)
+
+            try:
+                st.data_editor(
+                    search_results.drop(columns=["Image_Path"]),
+                    column_config={
+                        "ID": st.column_config.Column("ID"),
+                        "visitor_name": st.column_config.Column("Visitor Name"),
+                        "Timing": st.column_config.Column("Timing"),
+                        "image": st.column_config.ImageColumn(
+                            "Visitor Image", help="Preview of visitor images"
+                        )
+                    },
+                    hide_index=True,
+                    use_container_width=True
+                )
+            except Exception as e:
+                st.error(f"Error displaying search results: {e}")
+        else:
+            st.warning(f"No records found for {search_type}: {search_input}")
+
+initialize_db()
+
+# with st.sidebar:
+#     selection = option_menu("Main Menu", 
+#                             ["Take Attendance", "Add Person", "View Attendance", "Search Attendance", 
+#                              "Clear Database", "Clear Recent History"], 
+#                             icons=["camera", "person-add", "clipboard-data", "search", 
+#                                    "trash", "clock-history"], 
+#                             menu_icon="cast", 
+#                             default_index=0)
+
+# if selection == "Take Attendance":
+#     Takeattendance()
+# elif selection == "Add Person":
+#     personadder()
+# elif selection == "View Attendance":
+#     view_attendance()
+# elif selection == "Search Attendance":
+#     search_attendance()  # Adding the search function here
+# elif selection == "Clear Database":
+#     cleardatabase()
+# elif selection == "Clear Recent History":
+#     clearrecenthistory()
