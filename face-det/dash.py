@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from Attendmain import personadder,cleardatabase,view_registered_persons
+from Attendmain import personadder
 from utils import tts,extract_name,profilesetting
 import sqlite3
 from Manageatten import manageatt
@@ -8,7 +8,7 @@ def dashboard():
     with st.sidebar:
         selected = option_menu("Dashboard Menu", 
         ["Profile", 'Manage Attendance', 'ADD', 'Profile Setting', 'Logout'],
-        icons=['person-circle', 'gear', 'file-plus', 'gear-wide-connected', 'box-arrow-in-right'],
+        icons=['person-circle', 'clipboard-check', 'person-plus', 'tools', 'box-arrow-right'],
         menu_icon="cast", default_index=0)
 
     if selected == "Profile":
@@ -44,5 +44,4 @@ def dashboard():
         name = extract_name(username)
         tts(f"{name}, you have successfully logged out.")
         st.rerun()
-
 

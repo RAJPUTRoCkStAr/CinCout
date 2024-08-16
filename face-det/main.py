@@ -15,8 +15,13 @@ if st.session_state.logged_in:
     dashboard()
 else:
     with st.sidebar:
-        st.session_state.page = option_menu("Main Menu", ["Monitor", "Attendance","Search Attendance","Sign Up", "Login","Contact Us"], 
-        icons=['cast','camera','search','door-open','box-arrow-in-right','person-rolodex'], menu_icon="menu-up", default_index=0)
+        st.session_state.page = option_menu(
+    "Main Menu",
+    ["Monitor", "Attendance", "Search Attendance", "Sign Up", "Login", "Contact Us"], 
+    icons=['eye-fill', 'check2-square', 'search', 'plus-square', 'door-open', 'info-circle'], 
+    menu_icon="menu-up", 
+    default_index=0
+)
     
     if st.session_state.page == "Monitor":
         monitor()
