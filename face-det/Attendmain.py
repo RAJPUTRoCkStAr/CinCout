@@ -345,6 +345,17 @@ def personadder():
         st.image(img_file_buffer)
 
     if ((img_file_buffer is not None) & (len(face_name) > 1) & (len(email) > 1) & st.button('Click to Save!', use_container_width=True)):
+        # Check for unique email
+        conn = connect_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM visitors WHERE Name=?", (face_name,))
+        email_count = cursor.fetchone()[0]
+        conn.close()
+
+        if email_count > 0:
+            st.error("This email is already associated with another person. Please enter a different email.")
+            return
+
         unique_id = generate_10_digit_id()
         image_array = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
@@ -369,12 +380,12 @@ def personadder():
 
         df_new = pd.DataFrame(data=encodesCurFrame, columns=COLS_ENCODE)
         df_new['Name'] = face_name
-        df_new['Unique_ID'] = unique_id 
+        df_new['Unique_ID'] = unique_id
         df_new = df_new[['Unique_ID'] + ['Name'] + COLS_ENCODE].copy()
 
         add_data_db(df_new)
         email_body = f"Hello {face_name}"
-        send_email(email, "Your Unique ID", email_body,unique_id)
+        send_email(email, "Your Unique ID", email_body, unique_id)
 def search_attendance():
     st.header("Search Attendance Records")
     
