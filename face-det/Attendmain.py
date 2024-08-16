@@ -211,7 +211,17 @@ def view_attendance():
         )
     except Exception as e:
         st.error(f"Error displaying attendance data: {e}")
-
+def view_registered_persons():
+    
+    df = get_data_from_db()
+    
+    if df.empty:
+        st.warning("No registered persons found.")
+        return
+    
+    st.subheader("Registered Persons List")
+    
+    st.dataframe(df[['Unique_ID', 'Name']],use_container_width=True,hide_index=True)
 def Takeattendance():
     visitor_id = st.text_input("Enter your Unique ID:", '')
     if not visitor_id:
@@ -288,7 +298,7 @@ def Takeattendance():
 
 
 
-def send_email(recipient_email, subject, body):
+def send_email(recipient_email, subject, body,unique_id):
     sender_email = os.getenv('SMTP_USERNAME')
     sender_password = os.getenv('SMTP_PASSWORD')
 
@@ -299,11 +309,20 @@ def send_email(recipient_email, subject, body):
 
     html_body = f"""
     <html>
-    <body>
-        <h2 style="color: #4CAF50;">Hello {recipient_email.split('@')[0]},</h2>
-        <p style="font-size: 14px; color: #333;">{body}</p>
-        <br>
-        <p style="font-size: 12px; color: #999;">Best regards,<br>Team</p>
+    <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #4CAF50; text-align: center;">Hello {recipient_email.split('@')[0]},</h2>
+            <p style="font-size: 18px; line-height: 1.5;text-align: center; margin: 20px 0;color:blue">
+                {body}
+            </p>
+            <p style="font-size: 18px; font-weight: bold; color: #FF5722; text-align: center; margin: 20px 0;">
+                Your Unique ID: <span style="background-color: #FFFF00; padding: 5px 10px; border-radius: 5px; font-weight: bold; color: #333;">{unique_id}</span>
+            </p>
+            <p style="font-size: 14px; color: #555; text-align: center;">
+                Best regards,<br>
+                <strong>The Team</strong>
+            </p>
+        </div>
     </body>
     </html>
     """
@@ -372,8 +391,8 @@ def personadder():
         df_new = df_new[['Unique_ID'] + ['Name'] + COLS_ENCODE].copy()
 
         add_data_db(df_new)
-        email_body = f"Hello {face_name},\n\nYour unique ID is: {unique_id}\n\nBest regards,\nTeam"
-        send_email(email, "Your Unique ID", email_body)
+        email_body = f"Hello {face_name}"
+        send_email(email, "Your Unique ID", email_body,unique_id)
 def search_attendance():
     st.header("Search Attendance Records")
     

@@ -59,9 +59,9 @@ job_roles = {
 ######################################################################
 #for title
 def title():
-    st.set_page_config(page_title="IAA",layout="wide",page_icon='media/logo.png')
+    st.set_page_config(page_title="C-in C-out",layout="wide",page_icon='media/logo.png')
     user_color      = '#000000'
-    title_webapp    = "IAA-I AM AVAILABLE"
+    title_webapp    = "C-in C-out"
 
     html_temp = f"""
                 <div style="background-color:{user_color};padding:12px">
@@ -201,16 +201,17 @@ def send_password_reset_email(email, new_password):
         html = f"""
         <html>
         <body>
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h1 style="color: #1a73e8;">Password Reset Successful</h1>
-                <p>Hello,</p>
-                <p>Your password has been successfully reset. Your new password is:<h2><strong>{new_password}</strong></h2></p>
-                <p>Please log in with this new password and change it once you have access to your account.</p>
-                <p>If you did not request this change, please contact our support team immediately.</p>
-                <p>Best regards,<br>The Team</p>
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h1 style="color: #1a73e8; text-align: center;">Password Reset Successful</h1>
+            <p>Dear User,</p>
+            <p>We are pleased to inform you that your password has been successfully reset. Your new password is:</p>
+            <h2 style="color: #333; text-align: center;"><strong>{new_password}</strong></h2>
+            <p>Please use this new password to log in to your account. For security reasons, we recommend that you change your password immediately after logging in.</p>
+            <p>If you did not request this password reset, please contact our support team immediately to secure your account.</p>
+            <p>Best regards,<br>The Support Team</p>
             </div>
         </body>
-        </html>
+        </html> 
         """
         message.attach(MIMEText(html, 'html'))
         

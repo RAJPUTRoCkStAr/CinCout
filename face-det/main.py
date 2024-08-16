@@ -15,10 +15,10 @@ if st.session_state.logged_in:
     dashboard()
 else:
     with st.sidebar:
-        st.session_state.page = option_menu("Main Menu", ["Home", "Attendance","Search Attendance","Sign Up", "Login","Contact Us"], 
-        icons=['house','camera','search','door-open','box-arrow-in-right','person-rolodex'], menu_icon="cast", default_index=0)
+        st.session_state.page = option_menu("Main Menu", ["Monitor", "Attendance","Search Attendance","Sign Up", "Login","Contact Us"], 
+        icons=['cast','camera','search','door-open','box-arrow-in-right','person-rolodex'], menu_icon="menu-up", default_index=0)
     
-    if st.session_state.page == "Home":
+    if st.session_state.page == "Monitor":
         home()
     if st.session_state.page == "Attendance":
         atten()
