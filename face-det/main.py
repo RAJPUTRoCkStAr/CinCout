@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from utils import title,contact,login,signup
 from dash import dashboard
-from Home import home
+from Monitor import monitor
 from Attendan import atten
 from Attendmain import search_attendance
 title()
@@ -19,7 +19,7 @@ else:
         icons=['cast','camera','search','door-open','box-arrow-in-right','person-rolodex'], menu_icon="menu-up", default_index=0)
     
     if st.session_state.page == "Monitor":
-        home()
+        monitor()
     if st.session_state.page == "Attendance":
         atten()
     if st.session_state.page == "Search Attendance":

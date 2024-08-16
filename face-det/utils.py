@@ -11,6 +11,7 @@ import os
 from streamlit_option_menu import option_menu
 from Stsocialicon import SocialMediaIcons
 import pandas as pd
+import base64
 ################################################################
 #text-to-speech
 def tts(text):
@@ -62,13 +63,21 @@ def title():
     st.set_page_config(page_title="C-in C-out",layout="wide",page_icon='media/logo.png')
     user_color      = '#000000'
     title_webapp    = "C-in C-out"
-
-    html_temp = f"""
-                <div style="background-color:{user_color};padding:12px">
-                <h1 style="color:white;text-align:center;font-size: 38px;">{title_webapp}</h1>
-                </div>
-                """
+    logo_path = "media/logo.png"
+    with open(logo_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    html_temp =f"""
+        <div style="background-color:{user_color};padding:12px;display:flex;align-items:center;">
+            <img src="data:image/png;base64,{encoded_string}" style="width:100px;height:auto;margin-right:20px;">
+            <div style="flex-grow:1;text-align:center;">
+                <h1 style="color:white;font-size: 38px;">{title_webapp}</h1>
+            </div>
+        </div>  
+    """
+    
     st.markdown(html_temp, unsafe_allow_html=True)
+
+    
 #################################################################################
 #database connection
 conn = sqlite3.connect('data/database.db')
