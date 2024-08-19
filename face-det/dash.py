@@ -22,7 +22,6 @@ def dashboard():
             email, job_role, current_password, work_place = user_data
             st.session_state.work_place = work_place  # Store workplace in session state
             st.header(f"Welcome, {name}!")
-            st.subheader("Your Profile Information")
             st.write(f"**Username:** {username}")
             st.write(f"**Email:** {email}")
             st.write(f"**Job Role:** {job_role}")

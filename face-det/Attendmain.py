@@ -5,6 +5,7 @@ import os
 import shutil
 import cv2
 import numpy as np
+from test import test
 import pandas as pd
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from PIL import Image, ImageDraw
@@ -234,60 +235,90 @@ def Takeattendance():
     visitor_id = st.text_input("Enter your Unique ID:", '')
     if not visitor_id:
         st.error("Please enter your Unique ID.")
+        return
+    
     img_file_buffer = st.camera_input("Take a picture")
+    
     if img_file_buffer is not None:
         bytes_data = img_file_buffer.getvalue()
         image_array = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+
+        # Save the image for visitor history
         with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
             file.write(img_file_buffer.getbuffer())
             tts('Image Saved Successfully!')
             st.success('Image Saved Successfully!')
-            boxes, probs = mtcnn.detect(image_array, landmarks=False)
-            if boxes is not None:
-                boxes_int = [[int(box[0]), int(box[1]), int(box[2]), int(box[3])] for box in boxes]
-                aligned = []
-                rois = []  # Initialize the rois list here
-                for box in boxes:
-                    face = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
-                    aligned_face = mtcnn(face)
+
+        # Detect faces in the image
+        boxes, probs = mtcnn.detect(image_array, landmarks=False)
+        
+        if boxes is not None:
+            boxes_int = [[int(box[0]), int(box[1]), int(box[2]), int(box[3])] for box in boxes]
+            aligned = []
+            rois = []
+            spoofs = []
+            can = []
+
+            # Perform anti-spoofing on each detected face
+            for idx, box in enumerate(boxes_int):
+                img = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
+                spoof = test(img, "./resources/anti_spoof_models", device)
+                if spoof <= 1:
+                    spoofs.append("REAL")
+                    can.append(idx)
+                    # Align the face for encoding
+                    aligned_face = mtcnn(img)
                     if aligned_face is not None:
                         encodesCurFrame = resnet(aligned_face.to(device)).detach().cpu()
                         aligned.append(encodesCurFrame)
-                if len(aligned) > 0:
-                    similarity_threshold = 0.5
-                    for face_idx in range(len(aligned)):
-                        database_data = get_data_from_db()
-                        face_encodings = database_data[COLS_ENCODE].values
-                        dataframe = database_data[COLS_INFO]
-                        face_to_compare = aligned[face_idx].numpy()
-                        similarity = np.dot(face_encodings, face_to_compare.T)
-                        matches = similarity > similarity_threshold
-                        if matches.any():
-                            idx = np.argmax(similarity[matches])
-                            dataframe_new = dataframe.iloc[idx]
-                            name_visitor = dataframe_new['Name']
-                            add_attendance(visitor_id, name_visitor)
-                            flag_show = True
-                            (left, top, right, bottom) = (boxes_int[face_idx])
-                            rois.append(image_array_copy[top:bottom, left:right].copy())
-                            cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
-                            cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
-                            font = cv2.FONT_HERSHEY_DUPLEX
-                            cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
-                        else:
-                            tts('No Match Found for the given Similarity Threshold!')
-                            st.error('No Match Found for the given Similarity Threshold!')
-                            st.info('Please Update the database for a new person or click again!')
-                            tts('Please Update the database for a new person or click again!')
-                            add_attendance(visitor_id, 'Unknown')
+                else:
+                    spoofs.append("FAKE")
+
+            if len(aligned) > 0:
+                similarity_threshold = 0.5
+                flag_show = False
+                
+                for face_idx in can:
+                    database_data = get_data_from_db()
+                    face_encodings = database_data[COLS_ENCODE].values
+                    dataframe = database_data[COLS_INFO]
+                    face_to_compare = aligned[face_idx].numpy()
+
+                    similarity = np.dot(face_encodings, face_to_compare.T)
+                    matches = similarity > similarity_threshold
+                    
+                    if matches.any():
+                        idx = np.argmax(similarity[matches])
+                        dataframe_new = dataframe.iloc[idx]
+                        name_visitor = dataframe_new['Name']
+                        add_attendance(visitor_id, name_visitor)
+                        flag_show = True
+                        (left, top, right, bottom) = (boxes_int[face_idx])
+                        rois.append(image_array_copy[top:bottom, left:right].copy())
+                        
+                        # Draw a rectangle and label
+                        cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
+                        cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
+                        font = cv2.FONT_HERSHEY_DUPLEX
+                        cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
+                    else:
+                        tts('No Match Found for the given Similarity Threshold!')
+                        st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
+                        st.info('Please Update the database for a new person or click again!')
+                        add_attendance(visitor_id, 'Unknown')
+
                 if flag_show:
                     st.image(BGR_to_RGB(image_array_copy), width=720)
                     tts("Attendance Marked successfully")
                     st.success("Attendance Marked successfully")
             else:
-                tts('No human face detected.')
-                st.error('No human face detected.')
+                tts('No real faces detected')
+                st.error('No real faces detected')
+        else:
+            tts('No human face detected.')
+            st.error('No human face detected.')
+
 def send_email(recipient_email, subject, body,unique_id):
     sender_email = os.getenv('SMTP_USERNAME')
     sender_password = os.getenv('SMTP_PASSWORD')
