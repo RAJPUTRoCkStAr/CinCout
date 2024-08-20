@@ -41,22 +41,22 @@ def BGR_to_RGB(image_in_array):
 def initialize_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    
-    # Define encoding columns for the visitors table
+
     encoding_columns = ', '.join(f'{col} REAL' for col in COLS_ENCODE)
     
-    # Create visitors table
+
     cursor.execute(f'''
     CREATE TABLE IF NOT EXISTS visitors (
         Unique_ID TEXT PRIMARY KEY,
         Name TEXT NOT NULL,
+        Email TEXT NOT NULL UNIQUE,
         Workplace TEXT NOT NULL,
         Job_role TEXT NOT NULL,
         {encoding_columns}
     )
     ''')
 
-    # Create attendance table
+
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS attendance (
         ID TEXT,
@@ -69,24 +69,24 @@ def initialize_db():
     conn.commit()
     conn.close()
 
-
-def add_data_db(visitor_details):
-    conn = sqlite3.connect(DB_PATH)
+def add_data_db(df):
+    conn = connect_db()
     cursor = conn.cursor()
-    
-    for _, row in visitor_details.iterrows():
-        cursor.execute('''
-        INSERT OR REPLACE INTO visitors (Unique_ID, Name, Workplace, Job_role, {columns})
-        VALUES (?, ?, ?, ?, {placeholders})
-        '''.format(columns=', '.join(COLS_ENCODE),
-                   placeholders=', '.join('?' * len(COLS_ENCODE))),
-                   (row['Unique_ID'], row['Name'], row['Workplace'], row['Job_role'], *row[COLS_ENCODE]))
-    
+
+    expected_columns = ['Unique_ID', 'Name', 'Workplace', 'Job_role', 'Email'] + COLS_ENCODE
+    df = df[expected_columns]  
+
+    columns = ', '.join(expected_columns)
+    placeholders = ', '.join(['?'] * len(expected_columns))
+    sql = f"INSERT INTO visitors ({columns}) VALUES ({placeholders})"
+
+
+    data = df.to_records(index=False).tolist()
+
+
+    cursor.executemany(sql, data)
     conn.commit()
     conn.close()
-    tts('Details Added Successfully!')
-    st.success('Details Added Successfully!')
-
 
 def get_data_from_db():
     conn = sqlite3.connect(DB_PATH)
@@ -98,7 +98,7 @@ def get_data_from_db():
     data = cursor.fetchall()
     conn.close()
     
-    df = pd.DataFrame(data, columns=['Unique_ID', 'Name','Workplace','job_role'] + COLS_ENCODE)
+    df = pd.DataFrame(data, columns=['Unique_ID', 'Name','Email','Workplace','job_role'] + COLS_ENCODE)
     return df
 
 def add_attendance(id, name):
@@ -162,13 +162,11 @@ def clearrecenthistory():
     conn = connect_db()
     cursor = conn.cursor()
     
-    # Clear all entries from the attendance table
     cursor.execute("DELETE FROM attendance")
     
     conn.commit()
     conn.close()
     
-    # Optionally, remove the image history
     shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
     os.mkdir(VISITOR_HISTORY)
     
@@ -229,7 +227,7 @@ def view_registered_persons():
     
     st.subheader("Registered Persons List")
     
-    st.dataframe(df[['Unique_ID', 'Name', 'Workplace', 'job_role']], use_container_width=True, hide_index=True)
+    st.dataframe(df[['Unique_ID', 'Name', 'Email','Workplace', 'job_role']], use_container_width=True, hide_index=True)
 
 def Takeattendance():
     visitor_id = st.text_input("Enter your Unique ID:", '')
@@ -244,13 +242,13 @@ def Takeattendance():
         image_array = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
-        # Save the image for visitor history
+
         with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
             file.write(img_file_buffer.getbuffer())
             tts('Image Saved Successfully!')
             st.success('Image Saved Successfully!')
 
-        # Detect faces in the image
+
         boxes, probs = mtcnn.detect(image_array, landmarks=False)
         
         if boxes is not None:
@@ -260,14 +258,14 @@ def Takeattendance():
             spoofs = []
             can = []
 
-            # Perform anti-spoofing on each detected face
+
             for idx, box in enumerate(boxes_int):
                 img = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
                 spoof = test(img, "./resources/anti_spoof_models", device)
                 if spoof <= 1:
                     spoofs.append("REAL")
                     can.append(idx)
-                    # Align the face for encoding
+
                     aligned_face = mtcnn(img)
                     if aligned_face is not None:
                         encodesCurFrame = resnet(aligned_face.to(device)).detach().cpu()
@@ -297,7 +295,6 @@ def Takeattendance():
                         (left, top, right, bottom) = (boxes_int[face_idx])
                         rois.append(image_array_copy[top:bottom, left:right].copy())
                         
-                        # Draw a rectangle and label
                         cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
                         cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
                         font = cv2.FONT_HERSHEY_DUPLEX
@@ -360,87 +357,16 @@ def send_email(recipient_email, subject, body,unique_id):
     except Exception as e:
         st.error(f"Failed to send email: {str(e)}")
 
-def personadder():
-    face_name = st.text_input('Name:', '')
-    email = st.text_input('Email:', '')
 
-    # Define job roles for different workplaces
+def personadder():
+    face_name = st.text_input('Name:')
+    email = st.text_input('Email:')
+    
     roles = {
-        "School": [
-            "Vice Principal/Assistant Principal",
-            "Grade 1 Students",
-            "Grade 2 Students",
-            "Grade 3 Students",
-            "Grade 4 Students",
-            "Grade 5 Students",
-            "Grade 6 Students",
-            "Grade 7 Students",
-            "Grade 8 Students",
-            "Grade 9 Students",
-            "Grade 10 Students",
-            "Grade 11 Students",
-            "Grade 12 Students",
-            "Classroom Teacher",
-            "Special Education Teacher",
-            "Teaching Assistant/Paraprofessional",
-            "Subject Specialist (e.g., Math, Science)",
-            "Extracurricular Activities Coordinator"
-        ],
-        "University": [
-            "Vice President/Chancellor",
-            "Professor",
-            "Associate Professor",
-            "Assistant Professor",
-            "Lecturer",
-            "Teaching Assistant",
-            "Research Scientist",
-            "Postdoctoral Fellow",
-            "Department Chair",
-            "Registrar",
-            "Academic Advisor",
-            "Campus Security Officer",
-            "IT Specialist",
-            "Lab Technician",
-            "Career Services Coordinator",
-            "Library Director",
-            "Facilities Manager"
-        ],
-        "Hospital": [
-            "Administrator",
-            "Physician/Doctor",
-            "Surgeon",
-            "Anesthesiologist",
-            "Registered Nurse",
-            "Nurse Practitioner",
-            "Medical Assistant",
-            "Pharmacist",
-            "Radiologic Technologist",
-            "Lab Technician",
-            "Physical Therapist",
-            "Occupational Therapist",
-            "Billing Specialist",
-            "Patient Care Technician",
-            "Phlebotomist",
-            "Dietitian/Nutritionist",
-            "Housekeeping Staff"
-        ],
-        "Office": [
-            "Office Manager",
-            "Manager",
-            "Assistant",
-            "IT Specialist",
-            "HR Specialist",
-            "Receptionist",
-            "Executive Assistant",
-            "Operations Manager",
-            "Project Manager",
-            "Marketing Manager",
-            "Accountant",
-            "Financial Analyst",
-            "Sales Representative",
-            "Customer Service Representative",
-            "Network Administrator"
-        ]
+        "School": ["Vice Principal/Assistant Principal", "Grade 1 Students", "Grade 2 Students", "Grade 3 Students", "Grade 4 Students", "Grade 5 Students", "Grade 6 Students", "Grade 7 Students", "Grade 8 Students", "Grade 9 Students", "Grade 10 Students", "Grade 11 Students", "Grade 12 Students", "Classroom Teacher", "Special Education Teacher", "Teaching Assistant/Paraprofessional", "Subject Specialist (e.g., Math, Science)", "Extracurricular Activities Coordinator"],
+        "University": ["Vice President/Chancellor", "Professor", "Associate Professor", "Assistant Professor", "Lecturer", "Teaching Assistant", "Research Scientist", "Postdoctoral Fellow", "Department Chair", "Registrar", "Academic Advisor", "Campus Security Officer", "IT Specialist", "Lab Technician", "Career Services Coordinator", "Library Director", "Facilities Manager"],
+        "Hospital": ["Administrator", "Physician/Doctor", "Surgeon", "Anesthesiologist", "Registered Nurse", "Nurse Practitioner", "Medical Assistant", "Pharmacist", "Radiologic Technologist", "Lab Technician", "Physical Therapist", "Occupational Therapist", "Billing Specialist", "Patient Care Technician", "Phlebotomist", "Dietitian/Nutritionist", "Housekeeping Staff"],
+        "Office": ["Office Manager", "Manager", "Assistant", "IT Specialist", "HR Specialist", "Receptionist", "Executive Assistant", "Operations Manager", "Project Manager", "Marketing Manager", "Accountant", "Financial Analyst", "Sales Representative", "Customer Service Representative", "Network Administrator"]
     }
 
     workplace = st.session_state.get('work_place', None)
@@ -474,7 +400,8 @@ def personadder():
     if ((img_file_buffer is not None) & (len(face_name) > 1) & (len(email) > 1) & st.button('Click to Save!', use_container_width=True)):
         conn = connect_db()
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM visitors WHERE Name=?", (face_name,))
+        
+        cursor.execute("SELECT COUNT(*) FROM visitors WHERE Email=?", (email,))
         email_count = cursor.fetchone()[0]
         conn.close()
 
@@ -509,16 +436,18 @@ def personadder():
         df_new['Unique_ID'] = unique_id
         df_new['Workplace'] = workplace
         df_new['Job_role'] = job
-        df_new = df_new[['Unique_ID'] + ['Name']+['Workplace']+['Job_role'] + COLS_ENCODE].copy()
+        df_new['Email'] = email  
+        df_new = df_new[['Unique_ID'] + ['Name'] + ['Workplace'] + ['Job_role'] + ['Email'] + COLS_ENCODE].copy()
 
         add_data_db(df_new)
         email_body = f"Hello {face_name} You are working in {workplace} and your role is {job}"
         send_email(email, "Your Unique ID", email_body, unique_id)
 
+
 def search_attendance():
     st.header("Search Attendance Records")
     
-    # Search criteria
+
     search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
     search_input = st.text_input(f"Enter {search_type} to search:", '')
     

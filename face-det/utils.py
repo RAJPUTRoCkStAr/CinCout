@@ -568,7 +568,7 @@ def contact():
         st.write("""
         Welcome to the official website of Binary Coders! We are a dynamic team of four passionate tech enthusiasts, united by a shared vision of leveraging technology to solve real-world problems. Our latest project is an innovative attendance and activity detection system designed to streamline processes in hospitals, schools, universities, and offices.
         """)
-        st.image('media/team.jpg',use_column_width=True,caption='team image')
+        st.image('media/team.jpg',use_column_width=True,caption='Team Image')
         # Vision
         st.subheader("Our Vision")
         st.write("""
