@@ -182,8 +182,8 @@ mtcnn = MTCNN(
         )
 
 def view_attendance():
-    st.write("### Attendance Records")
-    
+    st.markdown(f"<h4 style='text-align: center;color:red'>Attendance Records</h4>", unsafe_allow_html=True)
+
     df_combined = get_attendance_records()
     
     if df_combined.empty:
@@ -224,17 +224,19 @@ def view_registered_persons():
     if df.empty:
         st.warning("No registered persons found.")
         return
-    
-    st.subheader("Registered Persons List")
+    st.markdown(f"<h4 style='text-align: center;color:red'>Registered Persons List</h4>", unsafe_allow_html=True)
+
     
     st.dataframe(df[['Unique_ID', 'Name', 'Email','Workplace', 'job_role']], use_container_width=True, hide_index=True)
 
 def Takeattendance():
+    st.markdown(f"<h2 style='text-align: center;color:red'>Mark your Attendance</h2>", unsafe_allow_html=True)
     visitor_id = st.text_input("Enter your Unique ID:", '')
     if not visitor_id:
         st.error("Please enter your Unique ID.")
         return
-    
+    st.info("Ensure only your face is visible to the camera for attendance.")
+    tts("Ensure only your face is visible to the camera for attendance.")
     img_file_buffer = st.camera_input("Take a picture")
     
     if img_file_buffer is not None:
@@ -388,6 +390,8 @@ def personadder():
             file_bytes = np.asarray(bytearray(img_file_buffer.read()), dtype=np.uint8)
 
     elif pic_option == 'Take a Picture with Cam':
+        st.info("Ensure only your face is visible to the camera for attendance.")
+        tts("Ensure only your face is visible to the camera for attendance.")
         img_file_buffer = st.camera_input("Take a Picture with Cam")
         if img_file_buffer is not None:
             file_bytes = np.frombuffer(img_file_buffer.getvalue(), np.uint8)
@@ -466,7 +470,8 @@ def search_attendance():
             st.warning(f"No records found for {search_type}: {search_input}")
 initialize_db()
 def search_attendance():
-    st.header("Search Attendance Records")
+    st.markdown(f"<h4 style='text-align: center;color:red'>Search Attendance Records</h4>", unsafe_allow_html=True)
+
     
     search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
     search_input = st.text_input(f"Enter {search_type} to search:", '')

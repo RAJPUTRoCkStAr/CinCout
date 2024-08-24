@@ -5,13 +5,12 @@ from utils import tts,extract_name,profilesetting
 import sqlite3
 from Manageatten import manageatt
 def dashboard():
+
     with st.sidebar:
         selected = option_menu("Dashboard Menu", 
-        ["Profile", 'Manage Attendance', 'ADD', 'Profile Setting', 'Logout'],
-        icons=['person-circle', 'clipboard-check', 'person-plus', 'tools', 'box-arrow-right'],
+        ['Manage Attendance', 'ADD', 'Profile Setting', 'Logout'],
+        icons=['clipboard-check', 'person-plus', 'file-person', 'box-arrow-right'],
         menu_icon="cast", default_index=0)
-
-    if selected == "Profile":
         conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
         username = st.session_state.username
@@ -20,19 +19,23 @@ def dashboard():
         user_data = c.fetchone()
         if user_data:
             email, job_role, current_password, work_place = user_data
-            st.session_state.work_place = work_place  # Store workplace in session state
-            st.header(f"Welcome, {name}!")
-            st.write(f"**Username:** {username}")
-            st.write(f"**Email:** {email}")
-            st.write(f"**Job Role:** {job_role}")
-            st.write(f"**Workplace:** {work_place}")
+            st.session_state.work_place = work_place
+            st.markdown(f"<h2 style='text-align: center;'>Personal Information</h2>", unsafe_allow_html=True)
+            st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
+            st.markdown(f"**👤 Username:** `{username}`")
+            st.markdown(f"**📧 Email:** `{email}`")
+            st.markdown(f"**💼 Job Role:** `{job_role}`")
+            st.markdown(f"**🏢 Workplace:** `{work_place}`")
+            st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
         else:
             st.error("User data not found.")
             tts("User data not found.")
         conn.close()
-    elif selected == "Manage Attendance":
+
+    if selected == "Manage Attendance":
         manageatt()
     elif selected == "ADD":
+        st.markdown(f"<h2 style='text-align: center;color:red'>Register a person for Attendance</h2>", unsafe_allow_html=True)
         personadder()
     elif selected == "Profile Setting":
         profilesetting()

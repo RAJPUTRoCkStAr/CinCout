@@ -99,7 +99,7 @@ conn.commit()
 def signup(item):
     conn = sqlite3.connect('data/database.db') 
     c = conn.cursor()
-    st.header(f"Sign Up for {item} Management")
+    st.markdown(f"<h2 style='text-align: center;color:red'>Sign Up for {item} Management</h2>", unsafe_allow_html=True)
     with st.form(key="signup_form", clear_on_submit=True):
         name = st.text_input("Enter your name")
         job_role = st.selectbox("Select your job role", job_roles[item])
@@ -146,9 +146,7 @@ def signup(item):
 def login(item):
     conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
-
-    st.subheader(f"Log in Here 👇 for {item} Management")
-    
+    st.markdown(f"<h2 style='text-align: center;color:red'>Log in Here 👇 for {item} Management</h2>", unsafe_allow_html=True)
     with st.form(key="login_form", clear_on_submit=True):
         username = st.text_input("Enter your username")
         password = st.text_input("Enter your password", type="password")
@@ -473,12 +471,10 @@ def send_password_change_email(email):
         tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
 ###############################################################################
-# forgot password
-
 #########################################################################
 #profile setting
 def profilesetting():
-    st.header("Profile setting")
+    st.markdown(f"<h2 style='text-align: center;color:red'>Profile Setting</h2>", unsafe_allow_html=True)
     selected2 = option_menu(None, ["Change Username", "Update Job Role", "Change Password"], 
     icons=['fill-person-fill', 'bookmark-star', "passport"], 
     menu_icon="cast", default_index=0, orientation="horizontal")
@@ -539,8 +535,7 @@ def send_thank_you_email(email, username, password, job_role, item, place_name):
 ##################################################################################
 ##Contact us 
 def contact():
-    st.header("Contact Us")
-    st.write("If you have any questions, feel free to contact us using the form below.")
+    st.markdown(f"<h2 style='text-align: center;color:red'>Contact us</h2>", unsafe_allow_html=True)
 
     with st.form(key="contact_form", clear_on_submit=True):
         name = st.text_input("Enter your name")
@@ -564,7 +559,7 @@ def contact():
         icons=['people', 'person-bounding-box'],
         menu_icon="microsoft-teams", default_index=0,orientation="horizontal")
     if select == 'Team':
-        st.header('Binary Coders')
+        st.header('Binary Coders',divider='rainbow')
         st.write("""
         Welcome to the official website of Binary Coders! We are a dynamic team of four passionate tech enthusiasts, united by a shared vision of leveraging technology to solve real-world problems. Our latest project is an innovative attendance and activity detection system designed to streamline processes in hospitals, schools, universities, and offices.
         """)
