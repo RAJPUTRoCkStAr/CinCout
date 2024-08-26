@@ -592,7 +592,7 @@ def contact():
                 "https://www.linkedin.com/in/sumit-singh-773921262/",
                 "https://www.linkedin.com/in/mantu-kumar-rana-71a6ba25b/",
                 "https://www.linkedin.com/in/mayank-pathak-46168a281/",
-                ""
+                "https://www.linkedin.com/in/madan-hs-491523317/"
             ],
             "GitHub": [
                 "https://github.com/RAJPUTRoCkStAr",
