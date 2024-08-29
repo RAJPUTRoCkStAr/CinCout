@@ -1,0 +1,6 @@
+path: /kaggle/input/doordataset/doors_detection  # Path to the dataset folder
+train: /kaggle/input/doordataset/doors_detection/train
+val: /kaggle/input/doordataset/doors_detection/val
+
+nc: 1  # Number of classes (1 for door)
+names: ['door']  # Class names

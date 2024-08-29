@@ -1,16 +1,16 @@
+from email.mime.multipart import MIMEMultipart
+from streamlit_option_menu import option_menu
+from email.mime.text import MIMEText
+import streamlit as st
+import pandas as pd
 import pyttsx3
 import random
 import string
 import smtplib
-import re
 import sqlite3
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import streamlit as st
-import os
-from streamlit_option_menu import option_menu
-import pandas as pd
 import base64
+import re
+import os
 ################################################################
 #text-to-speech
 def tts(text):

@@ -1,5 +1,6 @@
 #######################################################
 import uuid ## random id generator
+from facenet_pytorch import MTCNN, InceptionResnetV1
 from streamlit_option_menu import option_menu
 import streamlit as st
 import os
@@ -7,7 +8,6 @@ import shutil
 import cv2
 import numpy as np
 import pandas as pd
-from facenet_pytorch import MTCNN, InceptionResnetV1
 from PIL import Image, ImageDraw
 from test import test
 import torch

@@ -1,13 +1,13 @@
-import os
-import cv2
-import numpy as np
-import argparse
-import warnings
-import time
-
 from src.anti_spoof_predict import AntiSpoofPredict
 from src.generate_patches import CropImage
 from src.utility import parse_model_name
+import numpy as np
+import warnings
+import argparse
+import time
+import cv2
+import os
+
 warnings.filterwarnings('ignore')
 
 

@@ -1,8 +1,8 @@
-import streamlit as st
+from Attendmain import view_attendance,view_registered_persons,cleardatabase,search_attendance,clearrecenthistory
 from streamlit_option_menu import option_menu
 from utils import extract_name
+import streamlit as st
 import sqlite3
-from Attendmain import view_attendance,view_registered_persons,cleardatabase,search_attendance,clearrecenthistory
 def manageatt():
     conn = sqlite3.connect('data/database.db')
     c = conn.cursor()

@@ -1,10 +1,10 @@
-import streamlit as st
 from streamlit_option_menu import option_menu
 from utils import title,contact,login,signup
-from dash import dashboard
 from peoplecount import peoplecounter
-from Attendan import atten
 from Attendmain import search_attendance
+from Attendan import atten
+from dash import dashboard
+import streamlit as st
 title()
 
 if 'logged_in' not in st.session_state:

@@ -1,9 +1,9 @@
-import streamlit as st
+from utils import tts,extract_name,profilesetting
 from streamlit_option_menu import option_menu
 from Attendmain import personadder
-from utils import tts,extract_name,profilesetting
-import sqlite3
 from Manageatten import manageatt
+import streamlit as st
+import sqlite3
 def dashboard():
 
     with st.sidebar:

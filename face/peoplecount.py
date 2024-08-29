@@ -1,9 +1,9 @@
-import cv2
+from src.tracker import Tracker
+from ultralytics import YOLO
+import streamlit as st
 import pandas as pd
 import numpy as np
-from ultralytics import YOLO
-from src.tracker import Tracker
-import streamlit as st
+import cv2
 
 def peoplecounter():
     model = YOLO('yolov10n.pt')

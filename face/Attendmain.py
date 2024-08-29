@@ -1,24 +1,24 @@
-import uuid
-from streamlit_option_menu import option_menu
-import streamlit as st
-import os
-import shutil
-import cv2
-import numpy as np
-from test import test
-import pandas as pd
 from facenet_pytorch import MTCNN, InceptionResnetV1
-from PIL import Image, ImageDraw
-import torch
-import datetime
-import base64
-from utils import tts
-import smtplib
 from email.mime.multipart import MIMEMultipart
+from streamlit_option_menu import option_menu
 from email.mime.text import MIMEText
+from PIL import Image, ImageDraw
 from dotenv import load_dotenv
-import sqlite3
+import streamlit as st
+from test import test
+from utils import tts
+import pandas as pd
+import numpy as np
 import random,string
+import datetime
+import sqlite3
+import smtplib
+import base64
+import shutil
+import torch
+import uuid
+import cv2
+import os
 
 load_dotenv()
 allowed_image_type = ['.png', 'jpg', '.jpeg']
