@@ -1,3 +1,5 @@
+###################################################################################
+#Importing all required Modules
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from email.mime.multipart import MIMEMultipart
 from streamlit_option_menu import option_menu
@@ -21,6 +23,9 @@ import cv2
 import os
 
 load_dotenv()
+##############################################################################
+##############################################################################
+#reusable variable and terms
 allowed_image_type = ['.png', 'jpg', '.jpeg']
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 VISITOR_DB = os.path.join(ROOT_DIR, "visitor_database")
@@ -30,6 +35,9 @@ COLOR_WHITE = (255, 255, 255)
 COLS_INFO   = ['Name']
 COLS_ENCODE = [f'v{i}' for i in range(512)]
 DB_PATH     = os.path.join(ROOT_DIR, "data/database.db")
+####################################################################################
+#################################################################################
+## Common function for attendance system
 def generate_10_digit_id():
     uuid_int = uuid.uuid4().int
     alphanumeric_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -37,6 +45,8 @@ def generate_10_digit_id():
     return alphanumeric_id + numeric_part
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
+##############################################################################
+##############################################################################
 ## Database
 def initialize_db():
     conn = sqlite3.connect(DB_PATH)
@@ -100,7 +110,9 @@ def get_data_from_db():
     
     df = pd.DataFrame(data, columns=['Unique_ID', 'Name','Email','Workplace','job_role'] + COLS_ENCODE)
     return df
-
+################################################################################
+######################################################################
+## view attendance and recording of admin
 def add_attendance(id, name):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -127,7 +139,9 @@ def get_attendance_records():
     
     df = pd.DataFrame(data, columns=['ID', 'visitor_name', 'Timing', 'Image_Path'])
     return df
-
+#################################################################################
+#################################################################### ###########
+### croping or preprocessing of image
 def crop_image_with_ratio(img, height, width, middle):
     h, w = img.shape[:2]
     h = h - h % 4
@@ -141,6 +155,9 @@ def crop_image_with_ratio(img, height, width, middle):
     else:
         cropped_img = img[0:h, startx:endx]
     return cropped_img
+##########################################################################
+################################################################################
+##  clear admin records
 def connect_db(db_path=DB_PATH):
     conn = sqlite3.connect(db_path)
     return conn
@@ -157,7 +174,9 @@ def cleardatabase():
 
     if not os.path.exists(VISITOR_DB):
         os.mkdir(VISITOR_DB)
-    
+################################################################################
+################################################################################
+# clear recent history
 def clearrecenthistory():
     conn = connect_db()
     cursor = conn.cursor()
@@ -172,7 +191,9 @@ def clearrecenthistory():
     
     tts('Recent history cleared successfully!')
     st.success('Recent history cleared successfully!')
-
+###################################################################################
+##################################################################################
+### keeping all models and 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN(
@@ -180,7 +201,9 @@ mtcnn = MTCNN(
         thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
         device=device, keep_all=True
         )
-
+################################################################################
+################################################################################
+## View attendance
 def view_attendance():
     st.markdown(f"<h4 style='text-align: center;color:green'>Attendance Records</h4>", unsafe_allow_html=True)
 
@@ -218,6 +241,9 @@ def view_attendance():
         )
     except Exception as e:
         st.error(f"Error displaying attendance data: {e}")
+#################################################################################
+#################################################################################
+# Viewing all registered person
 def view_registered_persons():
     df = get_data_from_db()
     
@@ -228,7 +254,8 @@ def view_registered_persons():
 
     
     st.dataframe(df[['Unique_ID', 'Name', 'Email','Workplace', 'job_role']], use_container_width=True, hide_index=True)
-
+###############################################################################
+## marking attendance
 def Takeattendance():
     st.markdown(f"<h2 style='text-align: center;color:green'>Mark your Attendance</h2>", unsafe_allow_html=True)
     visitor_id = st.text_input("Enter your Unique ID:", '')
@@ -358,7 +385,9 @@ def send_email(recipient_email, subject, body,unique_id):
         st.success(f"Unique ID sent to {recipient_email}")
     except Exception as e:
         st.error(f"Failed to send email: {str(e)}")
-
+##############################################################################
+###############################################################################
+## Adding person
 
 def personadder():
     face_name = st.text_input('Name:')
@@ -446,7 +475,9 @@ def personadder():
         add_data_db(df_new)
         email_body = f"Hello {face_name} You are working in {workplace} and your role is {job}"
         send_email(email, "Your Unique ID", email_body, unique_id)
-
+#################################################################################
+#################################################################################
+### search attendance
 
 def search_attendance():
     st.header("Search Attendance Records")
@@ -520,7 +551,9 @@ def search_attendance():
             st.warning(f"No records found for {search_type}: {search_input}")
 
 initialize_db()
-
+###############################################################################
+###############################################################################
+# Testing 
 # with st.sidebar:
 #     selection = option_menu("Main Menu", 
 #                             ["Take Attendance", "Add Person", "View Attendance", "Search Attendance", 

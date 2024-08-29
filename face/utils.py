@@ -1,3 +1,5 @@
+#####################################################################
+#Importing of all required modules
 from email.mime.multipart import MIMEMultipart
 from streamlit_option_menu import option_menu
 from email.mime.text import MIMEText
@@ -57,7 +59,7 @@ job_roles = {
                "Customer Service Representative", "Network Administrator"]
 }
 ######################################################################
-#for title
+# for title and pages setting
 def title():
     st.set_page_config(page_title="C-in C-out",layout="wide",page_icon='media/logo.png')
     user_color      = '#000000'
@@ -87,7 +89,18 @@ def title():
     """
     st.markdown(background_image, unsafe_allow_html=True)
 
-
+#     st.markdown("""
+#     <style>
+#         .reportview-container {
+#             margin-top: -2em;
+#         }
+#         #MainMenu {visibility: hidden;}
+#         .stDeployButton {display:none;}
+#         footer {visibility: hidden;}
+#         #stDecoration {display:none;}
+#         header {visibility: hidden;}
+#     </style>
+# """, unsafe_allow_html=True)
     
 #################################################################################
 #database connection
@@ -324,7 +337,9 @@ def send_username_change_email(email, new_username):
     except Exception as e:
         tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
-
+###############################################################################
+###############################################################################
+#Change Job Role
 def change_job_role():
     conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
@@ -402,7 +417,9 @@ def send_job_role_change_email(email, new_job_role):
     except Exception as e:
         tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
-
+##################################################################################
+#################################################################################
+#Change Password
 def changepass():
     conn = sqlite3.connect('data/database.db')
     c = conn.cursor()
