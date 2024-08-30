@@ -137,7 +137,7 @@ def signup(item):
             if not name or not email or not password or not place_name:
                 st.error("Please fill in all required fields.")
                 tts("Please fill in all required fields.")
-            elif not re.match("^[A-Za-z\s]+$", name):
+            elif not re.match(r"^[A-Za-z\s]+$", name):
                 st.error("Name should contain only alphabets and spaces.")
                 tts("Name should contain only alphabets and spaces.")
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
