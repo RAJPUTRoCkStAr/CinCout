@@ -54,6 +54,7 @@
     python -m streamlit run main.py
     
 # Project Structure
+```bash
 .
 ├── Human-Activity/                     
 ├── docs/                           
@@ -113,7 +114,7 @@
 ├──note.md
 ├──README.md
 └──requirements.txt 
-
+```
 
        
 # conclusion
