@@ -194,7 +194,8 @@ def peoplecounter():
         try:
             rows = read_table()
             if rows:
-                st.write(pd.DataFrame(rows, columns=["ID", "EnteringTime", "ExitingTime"]))
+                st.dataframe(pd.DataFrame(rows, columns=["ID", "EnteringTime", "ExitingTime"]),
+                             use_container_width=True)
             else:
                 st.write("No data available in the table.")
         except Exception as e:
