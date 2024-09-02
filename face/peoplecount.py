@@ -185,17 +185,17 @@ def peoplecounter():
     elif option == "Live Camera":
         process_video(1)
 
-    st.sidebar.title("Database Operations")
-    if st.sidebar.button("Delete Table"):
+    st.title("Database Operations")
+    if st.button("Delete Table"):
         delete_table()
-        st.sidebar.success("Table deleted successfully.")
+        st.success("Table deleted successfully.")
 
-    if st.sidebar.button("Read Table"):
+    if st.button("Read Table"):
         try:
             rows = read_table()
             if rows:
-                st.sidebar.write(pd.DataFrame(rows, columns=["ID", "EnteringTime", "ExitingTime"]))
+                st.write(pd.DataFrame(rows, columns=["ID", "EnteringTime", "ExitingTime"]))
             else:
-                st.sidebar.write("No data available in the table.")
+                st.write("No data available in the table.")
         except Exception as e:
-            st.sidebar.write(f"Error: {str(e)}")
+            st.write(f"Error: {str(e)}")
