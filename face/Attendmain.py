@@ -2,9 +2,7 @@
 #Importing all required Modules
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from email.mime.multipart import MIMEMultipart
-from streamlit_option_menu import option_menu
 from email.mime.text import MIMEText
-from PIL import Image, ImageDraw
 from dotenv import load_dotenv
 import streamlit as st
 from test import test

@@ -1,6 +1,6 @@
 from streamlit_option_menu import option_menu
 from utils import title,contact,login,signup
-from utility.peoplecount import peoplecounter
+from peoplecount import peoplecounter
 from Attendmain import search_attendance
 from Attendan import atten
 from dash import dashboard
