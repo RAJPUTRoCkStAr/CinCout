@@ -54,66 +54,68 @@
     python -m streamlit run main.py
     
 # Project Structure
+```bash
 .
-├── Human-Activity/                     
-├── docs/                           
-    └── HRM.pdf
-    └── Human-Activity-Detection-Project.pptx                    
-    └── ABC.Docs                    
-├── face                           
-    └── .streamlit/
-        └── config.toml
-    └── data/
-        └── database.db
-    └── media/
-        └── Images
-    └── resources/                        
-        └── anti_spoof_models/                        
-            └── 2.7_80x80_MiniFASNetV2.pth                        
-            └── 4_0_0_80x80_MiniFASNetV1SE.pth 
-        └── detection_model
-            └── deploy.prototxt
-            └── Widerface-RetinaFace.caffemodel
-    └── src/
-        └── data_io/
-            └── dataset_folder.py
-            └── dataset_loader.py
-            └── functional.py
-            └── transform.py
-        └── model_lib
-            └── MiniFASNet.py
-            └── MultiFTNet.py
-            └── anti_spoof_predict.py
-            └── default_config.py
-            └── generate_patches.py
-            └── tracker.py
-            └── train_main.py
-            └── utility.py
-    └── testing/                 
-        └── videos                 
-    └──visitor_database/
-        └──visitor Images
-    └── Visitor_history/
-        └── Visitor history Images
-    └── attendaminaprac.py
-    └── Attendan.py
-    └── Attendmain.py
-    └── class.py
-    └── coco.txt
-    └── dash.py
-    └── data.yaml
-    └── main.py
-    └── Manageatten.py
-    └── test.py
-    └── train.py
-    └── utils.py
-    └── yolov10n.pt              
-├──.gitattributes
-├──.gitignore
-├──note.md
-├──README.md
-└──requirements.txt 
+├── Human-Activity/
+├── docs/
+│   ├── HRM.pdf
+│   ├── Human-Activity-Detection-Project.pptx
+│   └── ABC.Docs
+├── face/
+│   ├── .streamlit/
+│   │   └── config.toml
+│   ├── data/
+│   │   └── database.db
+│   ├── media/
+│   │   └── Images/
+│   ├── resources/
+│   │   ├── anti_spoof_models/
+│   │   │   ├── 2.7_80x80_MiniFASNetV2.pth
+│   │   │   └── 4_0_0_80x80_MiniFASNetV1SE.pth
+│   │   └── detection_model/
+│   │       ├── deploy.prototxt
+│   │       └── Widerface-RetinaFace.caffemodel
+│   ├── src/
+│   │   ├── data_io/
+│   │   │   ├── dataset_folder.py
+│   │   │   ├── dataset_loader.py
+│   │   │   ├── functional.py
+│   │   │   └── transform.py
+│   │   └── model_lib/
+│   │       ├── MiniFASNet.py
+│   │       ├── MultiFTNet.py
+│   │       ├── anti_spoof_predict.py
+│   │       ├── default_config.py
+│   │       ├── generate_patches.py
+│   │       ├── tracker.py
+│   │       ├── train_main.py
+│   │       └── utility.py
+│   ├── testing/
+│   │   └── videos/
+│   ├── visitor_database/
+│   │   └── visitor Images/
+│   ├── Visitor_history/
+│   │   └── Visitor history Images/
+│   ├── attendaminaprac.py
+│   ├── Attendan.py
+│   ├── Attendmain.py
+│   ├── class.py
+│   ├── coco.txt
+│   ├── dash.py
+│   ├── data.yaml
+│   ├── main.py
+│   ├── Manageatten.py
+│   ├── test.py
+│   ├── train.py
+│   └── utils.py
+│   └── yolov10n.pt
+├── .gitattributes
+├── .gitignore
+├── note.md
+├── README.md
+└── requirements.txt
 
+```
 
        
 # conclusion
