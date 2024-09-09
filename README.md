@@ -34,14 +34,6 @@ This repository features code for a real-time people-counting system utilizing Y
 
 ---
 
-
-# 2  People Entering and exit 
-    This repository contains the code for a real-time people-counting system using YOLOv8 and OpenCV. The system utilizes YOLOv8, a state-of-the-art object detection algorithm, to detect people in images and videos. Additionally, it includes a custom class that can be used for detecting people without relying on YOLOv8.
-
-
-
-
-
 ## **3. Clone the Repository**
 
 To get started, clone this repository to your local machine:
