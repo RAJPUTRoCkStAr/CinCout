@@ -37,8 +37,9 @@ This repository features code for a real-time people-counting system utilizing Y
 ## **3. Clone the Repository**
 
 To get started, clone this repository to your local machine:
+```bash
     git clone https://github.com/RAJPUTRoCkStAr/Human-activity.git
-
+```
 
 # Navigate into the project directory
     cd Human-Activity
