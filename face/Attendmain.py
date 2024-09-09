@@ -5,8 +5,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import streamlit as st
-from test import test
-from utils import tts
+from Test import test
+from Utils import tts
 import pandas as pd
 import numpy as np
 import random,string
@@ -26,13 +26,13 @@ load_dotenv()
 #reusable variable and terms
 allowed_image_type = ['.png', 'jpg', '.jpeg']
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-VISITOR_DB = os.path.join(ROOT_DIR, "visitor_database")
-VISITOR_HISTORY = os.path.join(ROOT_DIR, "visitor_history")
+VISITOR_DB = os.path.join(ROOT_DIR, "Visitor_database")
+VISITOR_HISTORY = os.path.join(ROOT_DIR, "Visitor_history")
 COLOR_DARK  = (0, 0, 153)
 COLOR_WHITE = (255, 255, 255)
 COLS_INFO   = ['Name']
 COLS_ENCODE = [f'v{i}' for i in range(512)]
-DB_PATH     = os.path.join(ROOT_DIR, "data/database.db")
+DB_PATH     = os.path.join(ROOT_DIR, "Data/database.db")
 ####################################################################################
 #################################################################################
 ## Common function for attendance system

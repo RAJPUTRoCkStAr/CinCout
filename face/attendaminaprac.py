@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw
-from test import test
+from Test import test
 import torch
 import datetime
 #######################################################

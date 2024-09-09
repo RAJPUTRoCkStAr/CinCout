@@ -1,6 +1,6 @@
 from Attendmain import view_attendance,view_registered_persons,cleardatabase,search_attendance,clearrecenthistory
 from streamlit_option_menu import option_menu
-from utils import extract_name
+from Utils import extract_name
 import streamlit as st
 import sqlite3
 def manageatt():

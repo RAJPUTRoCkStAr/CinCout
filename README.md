@@ -142,6 +142,5 @@ The MIT License is a permissive free software license originating from the Massa
 - **Warranty Disclaimer:** The Software is provided "as is", without warranty of any kind.
 
 For full details, please refer to the [LICENSE](LICENSE) file included in this repository.
-
 ---
 

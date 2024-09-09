@@ -1,9 +1,9 @@
 from streamlit_option_menu import option_menu
-from utils import title,contact,login,signup
-from peoplecount import peoplecounter
+from Utils import title,contact,login,signup
+from PeopleCount import peoplecounter
 from Attendmain import search_attendance
 from Attendan import atten
-from dash import dashboard
+from Dashboard import dashboard
 import streamlit as st
 title()
 
