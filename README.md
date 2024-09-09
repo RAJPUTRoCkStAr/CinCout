@@ -20,7 +20,7 @@ To maintain data security, only authorized administrators can log in to access, 
 
 ## **2. System Overview: People Entering and Exiting**
 
-This repository features code for a real-time people-counting system utilizing YOLOv8 and OpenCV for object detection. The system can detect individuals in images or videos using YOLOv8 or a custom class that bypasses YOLOv8.
+This repository features code for a real-time people-counting system utilizing YOLOv10 and OpenCV for object detection. The system can detect individuals in images or videos using YOLOv8 or a custom class that bypasses YOLOv10.
 
 ### **Screenshots**
 1. ![Screenshot 2024-08-30 111023](https://github.com/user-attachments/assets/7a6fa99c-4236-49b0-950d-20137556e782)
@@ -34,26 +34,37 @@ This repository features code for a real-time people-counting system utilizing Y
 
 ---
 
-## **3. Clone the Repository**
+## **3. Getting Started**
 
-To get started, clone this repository to your local machine:
+Follow the steps below to set up the project on your local machine:
+
+### **3.1 Clone the Repository**
+
+To get started, clone the repository to your local machine by running:
+
 ```bash
-    git clone https://github.com/RAJPUTRoCkStAr/Human-activity.git
+git clone https://github.com/RAJPUTRoCkStAr/Human-activity.git
 ```
-
-# Navigate into the project directory
-    cd Human-Activity
-    
-## Install dependencies
-    pip install -r requirements.txt
-
-# Run Cmd
-    cd face     
-    python -m streamlit run main.py
-    
-# Project Structure
+### 3.2 Navigate into the project directory 
+Once the repository is cloned, move into the project directory:
 ```bash
-.
+cd Human-Activity
+```    
+### 3.3 Install dependencies
+Install all the required dependencies using the following command:
+```bash
+pip install -r requirements.txt
+```
+### 3.4 Run the Application
+Finally, to start the application, navigate to the face directory and run the Streamlit application:
+```bash
+cd face     
+python -m streamlit run main.py
+```
+    
+## **4. Project Structure**
+The project structure is designed to facilitate easy navigation and organization of the codebase.
+```bash
 ├── Human-Activity/
 ├── docs/
 │   ├── HRM.pdf
@@ -114,10 +125,23 @@ To get started, clone this repository to your local machine:
 └── requirements.txt
 
 ```
-
-       
-# conclusion
-
+## **5. Conclusion**       
 In a face detection-based attendance system, the concepts of "Check-In" (C In) and "Check-Out" (C Out) are crucial for tracking when an individual starts and ends their presence within a particular environment, such as a workplace or classroom.
 
- 
+## **6. License**
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for detailed information.
+
+### **MIT License Summary**
+
+The MIT License is a permissive free software license originating from the Massachusetts Institute of Technology (MIT). It is one of the most commonly used open-source licenses. 
+
+#### **Key Points:**
+- **Permission:** Allows users to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.
+- **Attribution:** The above copyright notice and this permission notice must be included in all copies or substantial portions of the Software.
+- **Warranty Disclaimer:** The Software is provided "as is", without warranty of any kind.
+
+For full details, please refer to the [LICENSE](LICENSE) file included in this repository.
+
+---
+
