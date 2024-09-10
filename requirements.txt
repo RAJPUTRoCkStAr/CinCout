@@ -75,14 +75,10 @@ pycparser
 pydeck
 Pygments
 pyparsing
-pypiwin32
 pytest
 python-dateutil
 python-dotenv
 pyttsx3
-pytz
-pywin32
-PyYAML
 referencing
 requests
 rich
