@@ -59,6 +59,7 @@ networkx
 numpy
 opencv-contrib-python
 opencv-python
+opencv-python-headless
 opt-einsum
 optree
 packaging
@@ -75,14 +76,10 @@ pycparser
 pydeck
 Pygments
 pyparsing
-pypiwin32
 pytest
 python-dateutil
 python-dotenv
 pyttsx3
-pytz
-pywin32
-PyYAML
 referencing
 requests
 rich
