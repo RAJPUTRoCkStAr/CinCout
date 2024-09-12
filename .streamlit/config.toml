@@ -1,4 +1,5 @@
 [theme]
+headless = true
 base="dark"
 primaryColor="#376bdc"
 secondaryBackgroundColor="#000000"

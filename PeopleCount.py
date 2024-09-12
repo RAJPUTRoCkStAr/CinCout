@@ -120,7 +120,7 @@ def peoplecounter():
             st.success('Successfully uploaded video 👏👏!')
             tts('Successfully uploaded video!')
     elif option == "Live Camera":
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         st.success('Live camera activated!')
         tts('Live camera activated!')
 
