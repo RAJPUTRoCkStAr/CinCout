@@ -606,6 +606,7 @@ def contact():
         menu_icon="microsoft-teams", default_index=0,orientation="horizontal")
     if select == 'Team':
         st.header('Binary Coders',divider='rainbow')
+        st.balloons()
         st.write("""
         Welcome to the official website of Binary Coders! We are a dynamic team of four passionate tech enthusiasts, united by a shared vision of leveraging technology to solve real-world problems. Our latest project is an innovative attendance and activity detection system designed to streamline processes in hospitals, schools, universities, and offices.
         """)
