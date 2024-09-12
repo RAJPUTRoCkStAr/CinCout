@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import streamlit as st
 from Test import test
-# from Utils import tts
+from Utils import tts
 import pandas as pd
 import numpy as np
 import random,string
@@ -168,7 +168,7 @@ def cleardatabase():
     conn.commit()
     conn.close()
     
-    # tts('Visitor database cleared successfully!')
+    tts('Visitor database cleared successfully!')
     st.success('Visitor database cleared successfully!')
 
     if not os.path.exists(VISITOR_DB):
@@ -188,7 +188,7 @@ def clearrecenthistory():
     shutil.rmtree(VISITOR_HISTORY, ignore_errors=True)
     os.mkdir(VISITOR_HISTORY)
     
-    # tts('Recent history cleared successfully!')
+    tts('Recent history cleared successfully!')
     st.success('Recent history cleared successfully!')
 ###################################################################################
 ##################################################################################
@@ -262,7 +262,7 @@ def Takeattendance():
         st.error("Please enter your Unique ID.")
         return
     st.info("Ensure only your face is visible to the camera for attendance.")
-    # tts("Ensure only your face is visible to the camera for attendance.")
+    tts("Ensure only your face is visible to the camera for attendance.")
     img_file_buffer = st.camera_input("Take a picture")
     
     if img_file_buffer is not None:
@@ -273,7 +273,7 @@ def Takeattendance():
 
         with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
             file.write(img_file_buffer.getbuffer())
-            # tts('Image Saved Successfully!')
+            tts('Image Saved Successfully!')
             st.success('Image Saved Successfully!')
 
 
@@ -328,20 +328,20 @@ def Takeattendance():
                         font = cv2.FONT_HERSHEY_DUPLEX
                         cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
                     else:
-                        # tts('No Match Found for the given Similarity Threshold!')
+                        tts('No Match Found for the given Similarity Threshold!')
                         st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
                         st.info('Please Update the database for a new person or click again!')
                         add_attendance(visitor_id, 'Unknown')
 
                 if flag_show:
                     st.image(BGR_to_RGB(image_array_copy), width=720)
-                    # tts("Attendance Marked successfully")
+                    tts("Attendance Marked successfully")
                     st.success("Attendance Marked successfully")
             else:
-                # tts('No real faces detected')
+                tts('No real faces detected')
                 st.error('No real faces detected')
         else:
-            # tts('No human face detected.')
+            tts('No human face detected.')
             st.error('No human face detected.')
 
 def send_email(recipient_email, subject, body,unique_id):
@@ -419,13 +419,13 @@ def personadder():
 
     elif pic_option == 'Take a Picture with Cam':
         st.info("Ensure only your face is visible to the camera for attendance.")
-        # tts("Ensure only your face is visible to the camera for attendance.")
+        tts("Ensure only your face is visible to the camera for attendance.")
         img_file_buffer = st.camera_input("Take a Picture with Cam")
         if img_file_buffer is not None:
             file_bytes = np.frombuffer(img_file_buffer.getvalue(), np.uint8)
 
     if ((img_file_buffer is not None) & (len(face_name) > 1) & st.button('Image Preview', use_container_width=True)):
-        # tts("Previewing image")
+        tts("Previewing image")
         st.subheader("Image Preview")
         st.image(img_file_buffer)
 

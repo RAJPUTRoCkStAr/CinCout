@@ -1,4 +1,4 @@
-from Utils import extract_name,profilesetting
+from Utils import extract_name,profilesetting,tts
 from streamlit_option_menu import option_menu
 from Attendmain import personadder
 from Manageatten import manageatt
@@ -11,7 +11,7 @@ def dashboard():
         ['Manage Attendance', 'ADD', 'Profile Setting', 'Logout'],
         icons=['clipboard-check', 'person-plus', 'file-person', 'box-arrow-right'],
         menu_icon="cast", default_index=0)
-        conn = sqlite3.connect('data/database.db')
+        conn = sqlite3.connect('Data/database.db')
         c = conn.cursor()
         username = st.session_state.username
         name = extract_name(username)
@@ -29,7 +29,7 @@ def dashboard():
             st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
         else:
             st.error("User data not found.")
-            # tts("User data not found.")
+            tts("User data not found.")
         conn.close()
 
     if selected == "Manage Attendance":
@@ -44,6 +44,6 @@ def dashboard():
         st.session_state.page = "Home"
         username = st.session_state.username
         name = extract_name(username)
-        # tts(f"{name}, you have successfully logged out.")
+        tts(f"{name}, you have successfully logged out.")
         st.rerun()
 

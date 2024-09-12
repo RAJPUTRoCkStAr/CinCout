@@ -15,21 +15,14 @@ import re
 import os
 ################################################################
 #text-to-speech
-# def tts(text):
-#     engine = pyttsx3.init(driverName='sapi5')
-#     engine =  pyttsx3.init()
-#     rate = engine.getProperty('rate')
-#     engine.setProperty('rate', 175)                
-#     engine.say(text)
-#     engine.runAndWait()
 
-# def tts(text):
-#     engine = pyttsx3.init(driverName='sapi5')
-#     engine =  pyttsx3.init()
-#     rate = engine.getProperty('rate')
-#     engine.setProperty('rate', 175)                
-#     engine.say(text)
-#     engine.runAndWait()
+def tts(text):
+    engine = pyttsx3.init(driverName='sapi5')
+    engine =  pyttsx3.init()
+    rate = engine.getProperty('rate')
+    engine.setProperty('rate', 175)                
+    engine.say(text)
+    engine.runAndWait()
 
 ####################################################################
 
@@ -162,16 +155,16 @@ def signup(item):
         if submitted:
             if not name or not email or not password or not place_name:
                 st.error("Please fill in all required fields.")
-                # tts("Please fill in all required fields.")
+                tts("Please fill in all required fields.")
             elif not re.match(r"^[A-Za-z\s]+$", name):
                 st.error("Name should contain only alphabets and spaces.")
-                # tts("Name should contain only alphabets and spaces.")
+                tts("Name should contain only alphabets and spaces.")
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
                 st.error("Please enter a valid email address.")
-                # tts("Please enter a valid email address.")
+                tts("Please enter a valid email address.")
             elif not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$', password):
                 st.error("Password must be at least 7 characters long and contain a mixture of symbols, capital letters, small letters, and numbers.")
-                # tts("Password must be at least 7 characters long and contain a mixture of symbols, capital letters, small letters, and numbers.")
+                tts("Password must be at least 7 characters long and contain a mixture of symbols, capital letters, small letters, and numbers.")
             else:
                 c.execute('''
                     SELECT * FROM users 
@@ -179,7 +172,7 @@ def signup(item):
                 ''', (name, email, job_role, place_name, item))
                 if c.fetchone():
                     st.error('A user with the same name, email, job role, and place name already exists. Please try again.')
-                    # tts('A user with the same name, email, job role, and place name already exists. Please try again.')
+                    tts('A user with the same name, email, job role, and place name already exists. Please try again.')
                 else:
                     username = generate_username(name)
                     c.execute('SELECT * FROM users WHERE username = ?', (username,))
@@ -190,7 +183,7 @@ def signup(item):
                         send_thank_you_email(email, username, password, job_role, item, place_name)
                     else:
                         st.error('Username already exists. Please try again.')
-                        # tts('Username already exists. Please try again.')
+                        tts('Username already exists. Please try again.')
 #############################################################################
 #login 
 def login(item):
@@ -215,15 +208,15 @@ def login(item):
                     send_password_reset_email(email, new_password)
                 else:
                     st.error("Username not found.")
-                    # tts("Username not found.")
+                    tts("Username not found.")
             else:
                 st.error("Please enter your username.")
-                # tts("Please enter your username.")
+                tts("Please enter your username.")
         
         if login_button:
             if not username or not password:
                 st.error("Please enter both username and password.")
-                # tts("Please enter both username and password.")
+                tts("Please enter both username and password.")
             else:
                 c.execute('SELECT * FROM users WHERE username = ? AND password = ? AND item = ?', (username, password, item))
                 if c.fetchone():
@@ -233,10 +226,10 @@ def login(item):
                     st.session_state.password = password
                     st.session_state.page = "Dashboard"
                     st.success(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
-                    # tts(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
+                    tts(f"Welcome back, {username}! You have successfully logged in. Enjoy managing your {item}.")
                     st.rerun()
                 else:
-                    # tts('Invalid username or password. Please try again.')
+                    tts('Invalid username or password. Please try again.')
                     st.error('Invalid username or password. Please try again.')
 
 def generate_custom_password(length=8):
@@ -277,11 +270,11 @@ def send_password_reset_email(email, new_password):
             server.login(smtp_username, smtp_password)
             server.send_message(message)
         
-        # tts(f"A new password has been sent to {email}.")
+        tts(f"A new password has been sent to {email}.")
         st.success(f"A new password has been sent to {email}.")
     
     except Exception as e:
-        # tts(f"Failed to send email: {e}")
+        tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
 #####################################################################
 #changer username
@@ -305,21 +298,21 @@ def change_username():
                     workplace = st.session_state.item
                     c.execute('SELECT username FROM users WHERE username = ? AND item = ?', (new_username, workplace))
                     if c.fetchone():
-                        # tts("The new username is already taken within your workplace. Please choose another one.")
+                        tts("The new username is already taken within your workplace. Please choose another one.")
                         st.error("The new username is already taken within your workplace. Please choose another one.")
                     else:
                         c.execute('UPDATE users SET username = ? WHERE username = ?', (new_username, current_username))
                         conn.commit()
                         st.session_state.username = new_username
-                        # tts("Username changed successfully!")
+                        tts("Username changed successfully!")
                         st.success("Username changed successfully!")
                         send_username_change_email(email, new_username)
             else:
-                # tts("New username cannot be empty.")
+                tts("New username cannot be empty.")
                 st.error("New username cannot be empty.")
     
     except Exception as e:
-        # tts(f"An error occurred: {e}")
+        tts(f"An error occurred: {e}")
         st.error(f"An error occurred: {e}")
     
     finally:
@@ -357,11 +350,11 @@ def send_username_change_email(email, new_username):
             server.login(smtp_username, smtp_password)
             server.send_message(message)
         
-        # tts(f"A notification email has been dispatched to {email} concerning your username change request.")
+        tts(f"A notification email has been dispatched to {email} concerning your username change request.")
         st.success(f"A notification email has been dispatched to {email} concerning your username change request.")
     
     except Exception as e:
-        # tts(f"Failed to send email: {e}")
+        tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
 ###############################################################################
 ###############################################################################
@@ -388,18 +381,18 @@ def change_job_role():
                         c.execute('UPDATE users SET job_role = ? WHERE username = ?', (new_job_role, username))
                         conn.commit()
                         st.session_state.job_role = new_job_role
-                        # tts("Job role changed successfully!")
+                        tts("Job role changed successfully!")
                         st.success("Job role changed successfully!")
                         send_job_role_change_email(email, new_job_role)
                     else:
-                        # tts("Please select a job role.")
+                        tts("Please select a job role.")
                         st.error("Please select a job role.")
             else:
-                # tts("Invalid workplace.")
+                tts("Invalid workplace.")
                 st.error("Invalid workplace.")
     
     except Exception as e:
-        # tts(f"An error occurred: {e}")
+        tts(f"An error occurred: {e}")
         st.error(f"An error occurred: {e}")
     
     finally:
@@ -437,11 +430,11 @@ def send_job_role_change_email(email, new_job_role):
             server.login(smtp_username, smtp_password)
             server.send_message(message)
         
-        # tts(f"A notification email has been dispatched to {email} concerning your job role change.")
+        tts(f"A notification email has been dispatched to {email} concerning your job role change.")
         st.success(f"A notification email has been dispatched to {email} concerning your job role change request.")
     
     except Exception as e:
-        # tts(f"Failed to send email: {e}")
+        tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
 ##################################################################################
 #################################################################################
@@ -466,14 +459,14 @@ def changepass():
             
             if change_password:
                 if old_password != current_password:
-                    # tts("Your current password is incorrect. Please try again.")
+                    tts("Your current password is incorrect. Please try again.")
                     st.error("Your current password is incorrect. Please try again.")
                 elif not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$', new_password):
-                    # tts("New password must be at least 7 characters long and contain a mixture of symbols, capital letters, small letters, and numbers.")
+                    tts("New password must be at least 7 characters long and contain a mixture of symbols, capital letters, small letters, and numbers.")
                     st.error("New password must be at least 7 characters long and contain a mixture of symbols, capital letters, small letters, and numbers.")
 
                 elif new_password != confirm_new_password:
-                    # tts("New password and confirmation do not match. Please try again.")
+                    tts("New password and confirmation do not match. Please try again.")
                     st.error("New password and confirmation do not match. Please try again.")
                 else:
                     c.execute('UPDATE users SET password = ? WHERE username = ?', (new_password, username))
@@ -482,7 +475,7 @@ def changepass():
                     send_password_change_email(email)
                     st.session_state.password = new_password
     else:
-        # tts("User data not found.")
+        tts("User data not found.")
         st.error("User data not found.")
     
     conn.close()
@@ -518,11 +511,11 @@ def send_password_change_email(email):
             server.login(smtp_username, smtp_password)
             server.send_message(message)
         
-        # tts(f"A notification email has been dispatched to {email} concerning your password change request.")
+        tts(f"A notification email has been dispatched to {email} concerning your password change request.")
         st.success(f"A notification email has been dispatched to {email} concerning your password change request.")
     
     except Exception as e:
-        # tts(f"Failed to send email: {e}")
+        tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
 ###############################################################################
 #########################################################################
@@ -581,10 +574,10 @@ def send_thank_you_email(email, username, password, job_role, item, place_name):
             server.login(smtp_username, smtp_password)
             server.send_message(message)
         st.success(f"Congratulations, {username}! Your registration as a {job_role} in {place_name} is now complete. An email with your login credentials has been sent to {email}. Please check your inbox to access your account and start using our services.")
-        # tts(f"Congratulations, {username}! Your registration as a {job_role} in {place_name} is now complete. An email with your login credentials has been sent to {email}. Please check your inbox to access your account and start using our services.")
+        tts(f"Congratulations, {username}! Your registration as a {job_role} in {place_name} is now complete. An email with your login credentials has been sent to {email}. Please check your inbox to access your account and start using our services.")
     except Exception as e:
         st.error(f"Failed to send email: {e}")
-        # tts(f"Failed to send email: {e}")
+        tts(f"Failed to send email: {e}")
 
 ##################################################################################
 ##Contact us 
@@ -601,10 +594,10 @@ def contact():
         if submit_button:
             if not name or not email or not subject or not message:
                 st.error("Please fill in all required fields.")
-                # tts("Please fill in all required fields.")
+                tts("Please fill in all required fields.")
             elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
                 st.error("Please enter a valid email address.")
-                # tts("Please enter a valid email address.")
+                tts("Please enter a valid email address.")
             else:
                 send_contact_email(name, email, subject, message)
       
@@ -717,9 +710,9 @@ def send_contact_email(name, email, subject, message):
             server.login(smtp_username, smtp_password)
             server.send_message(message_obj)
 
-        # tts("Thank you for contacting us! Your message has been sent successfully.")
+        tts("Thank you for contacting us! Your message has been sent successfully.")
         st.success("Thank you for contacting us! Your message has been sent successfully.")
 
     except Exception as e:
-        # tts(f"Failed to send email: {e}")
+        tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
