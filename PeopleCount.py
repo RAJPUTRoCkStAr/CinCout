@@ -7,7 +7,7 @@ from src.tracker import Tracker
 from Utils import tts
 from datetime import datetime
 import sqlite3
-
+import torch
 # Initialize SQLite database for tracking data
 def initialize_db():
     try:
@@ -89,6 +89,8 @@ def delete_all_rows():
 # Function to handle the person counter and video processing
 def peoplecounter():
     # Load YOLO model
+    device = torch.device('cpu')
+    # model = torch.load('yolov10n.pt', map_location=device)
     model = YOLO('yolov10n.pt')
     area1 = [(337, 388), (314, 390), (499, 469), (522, 462)]
     area2 = [(304, 392), (275, 397), (448, 477), (479, 469)]
