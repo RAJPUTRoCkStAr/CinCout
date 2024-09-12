@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 def view_database():
-    database_path = 'data/database.db'
+    database_path = 'Data/database.db'
     
     st.title("Database Viewer")
 
