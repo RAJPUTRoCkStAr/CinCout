@@ -62,13 +62,12 @@ job_roles = {
 # for title and pages setting
 def title():
     st.set_page_config(page_title="C-in C-out",layout="wide",page_icon='media/logo.png')
-    user_color      = '#000000'
     title_webapp    = "C-in C-out"
     logo_path = "media/logo.png"
     with open(logo_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
     html_temp =f"""
-        <div style="background-color:{user_color};padding:12px;display:flex;align-items:center;">
+        <div style="background-color:rgba(0,0,0,0.5);padding:12px;display:flex;align-items:center;">
             <img src="data:image/png;base64,{encoded_string}" style="width:100px;height:auto;margin-right:20px;">
             <div style="flex-grow:1;text-align:center;">
                 <h1 style="color:white;font-size: 60px;">{title_webapp}</h1>
@@ -78,16 +77,33 @@ def title():
     st.markdown(html_temp, unsafe_allow_html=True)
     background_image = """
     <style>
-    [data-testid="stAppViewContainer"] > .main,
-    [data-testid="stSidebar"] {
-        background-image: url("https://loksun.ai/wp-content/uploads/2020/05/FR1-2.jpg") !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-repeat: no-repeat !important;
+    [data-testid="stAppViewContainer"] {
+        background-image: url("https://www.refreshmentsystems.co.uk/app/uploads/2021/07/A-short-history-of-Facial-Recognition-01-1251x700.png")  !important;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
     }
+
+    [data-testid="stSidebar"] {
+        background-color: rgba(0, 0, 0, 0.5);  /* Adds transparency to the sidebar */
+    }
+
+    [data-testid="stHeader"] {
+        background-color: rgba(0, 0, 0, 0);
+    }
+
+    [data-testid="stToolbar"] {
+        right: 2rem;
+    }
+
+    button[kind="sidebar"] {
+        background-color: transparent;  /* Ensures sidebar button is transparent */
+    }
+
     </style>
     """
     st.markdown(background_image, unsafe_allow_html=True)
+
 
 #     st.markdown("""
 #     <style>
