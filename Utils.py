@@ -5,7 +5,8 @@ from streamlit_option_menu import option_menu
 from email.mime.text import MIMEText
 import streamlit as st
 import pandas as pd
-import pyttsx3
+from gtts import gTTS
+from io import BytesIO
 import random
 import string
 import smtplib
@@ -17,12 +18,10 @@ import os
 #text-to-speech
 
 def tts(text):
-    engine = pyttsx3.init(driverName='sapi5')
-    engine =  pyttsx3.init()
-    rate = engine.getProperty('rate')
-    engine.setProperty('rate', 175)                
-    engine.say(text)
-    engine.runAndWait()
+    tts = gTTS(text=text, lang='en')
+    audio_fp = BytesIO()  # Create a file-like object in memory
+    tts.write_to_fp(audio_fp)
+    audio_fp.seek(0)
 
 ####################################################################
 
