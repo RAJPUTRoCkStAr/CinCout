@@ -1,4 +1,4 @@
-from Utils import tts,extract_name,profilesetting
+from Utils import extract_name,profilesetting
 from streamlit_option_menu import option_menu
 from Attendmain import personadder
 from Manageatten import manageatt
