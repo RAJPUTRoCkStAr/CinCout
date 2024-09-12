@@ -1,4 +1,4 @@
-﻿absl-py
+absl-py
 altair
 astunparse
 attrs
@@ -57,7 +57,6 @@ namex
 netron
 networkx
 numpy
-opencv-contrib-python
 opencv-python-headless
 opt-einsum
 optree
