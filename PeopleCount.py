@@ -348,5 +348,4 @@ def peoplecounter():
 
         cap.release()
 
-if __name__ == "__main__":
-    peoplecounter()
+
