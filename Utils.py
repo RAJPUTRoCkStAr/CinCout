@@ -15,13 +15,29 @@ import re
 import os
 ################################################################
 #text-to-speech
+import pyttsx3
+import platform
+
 def tts(text):
-    engine = pyttsx3.init(driverName='sapi5')
-    engine =  pyttsx3.init()
-    rate = engine.getProperty('rate')
-    engine.setProperty('rate', 175)                
+    # Determine the platform the app is running on
+    if platform.system() == 'Windows':
+        engine = pyttsx3.init(driverName='sapi5')  # Use Windows TTS engine
+    elif platform.system() == 'Linux':
+        engine = pyttsx3.init(driverName='espeak')  # Use eSpeak for Linux
+    else:
+        raise NotImplementedError(f"TTS not supported on {platform.system()} platform.")
+    
+    # Perform the TTS action
     engine.say(text)
     engine.runAndWait()
+
+# def tts(text):
+#     engine = pyttsx3.init(driverName='sapi5')
+#     engine =  pyttsx3.init()
+#     rate = engine.getProperty('rate')
+#     engine.setProperty('rate', 175)                
+#     engine.say(text)
+#     engine.runAndWait()
 
 ####################################################################
 
