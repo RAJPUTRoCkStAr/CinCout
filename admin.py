@@ -43,6 +43,6 @@ def view_database():
                 df = pd.read_sql_query(f'SELECT * FROM {table_selection}', conn)
                 conn.close()
                 st.write(f"Data from table: {table_selection}")
-                st.dataframe(df)
+                st.dataframe(df,use_container_width=True)
         else:
             st.write("No tables found in the database.")

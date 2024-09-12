@@ -19,7 +19,15 @@ else:
         st.session_state.page = option_menu(
     "Main Menu",
     ["Monitor", "Attendance", "Search Attendance", "Sign Up", "Login", "Contact Us","Admin"], 
-    icons=['eye-fill', 'check2-square', 'search', 'plus-square', 'door-open', 'info-circle'], 
+   icons = [
+    'eye-fill',        # Monitor
+    'check2-square',   # Attendance
+    'search',          # Search Attendance
+    'person-plus',     # Sign Up
+    'person-lock',     # Login
+    'envelope',        # Contact Us
+    'gear'             # Admin
+    ], 
     menu_icon="menu-up", 
     default_index=0
 )

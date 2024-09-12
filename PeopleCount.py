@@ -357,16 +357,16 @@ import cv2
 import pandas as pd
 import numpy as np
 import streamlit as st
+from streamlit_option_menu import option_menu
 from ultralytics import YOLO
 from src.tracker import Tracker
 import sqlite3
 from datetime import datetime
 
-# Connect to SQLite database (creates the database if it doesn't exist)
+
 conn = sqlite3.connect('Data/database.db', check_same_thread=False)
 db_cursor = conn.cursor()
 
-# Create table if it doesn't exist
 db_cursor.execute('''
 CREATE TABLE IF NOT EXISTS person_log (
     person_id INTEGER,
@@ -376,55 +376,59 @@ CREATE TABLE IF NOT EXISTS person_log (
 ''')
 conn.commit()
 
-# Function to insert data into the SQLite3 database
+
 def log_person_entry_exit(person_id, status):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     db_cursor.execute("INSERT INTO person_log (person_id, status, timestamp) VALUES (?, ?, ?)", (person_id, status, timestamp))
     conn.commit()
 
-# Function to view the data from the database
+
 def view_log():
     db_cursor.execute("SELECT * FROM person_log")
     data = db_cursor.fetchall()
     df = pd.DataFrame(data, columns=["person_id", "status", "timestamp"])
     return df
 
-# Function to delete a row from the database based on person_id
+
 def delete_row(person_id):
     db_cursor.execute("DELETE FROM person_log WHERE person_id = ?", (person_id,))
     conn.commit()
     st.success(f"Deleted person with ID {person_id}")
 
 def peoplecounter():
-    # Load the YOLO model
+    
     model = YOLO('yolov10n.pt')
 
     # Define the areas for entry and exit detection (top-left, top-right, bottom-right, bottom-left corners)
     area1 = [(365, 256), (603, 256), (603, 268), (365, 268)]
     area2 = [(365, 288), (603, 288), (603, 272), (365, 272)]
 
-    # Load COCO class names
     with open("coco.txt", "r") as my_file:
         data = my_file.read()
     class_list = data.split("\n")
 
-    # Initialize tracker and variables for counting
+
     tracker = Tracker()
     people_entering = {}
     entering = set()
     people_exiting = {}
     exiting = set()
 
-    # Streamlit UI components
-    st.title("Person Detection, Counting and Log Viewer")
 
-    # Tabs for switching between person counter and log viewer
-    tab1, tab2 = st.tabs(["People Counter", "View/Delete Logs"])
-
-    with tab1:
+    st.title("Person Counting and Log Viewer")
+    add = option_menu(
+    "Main Menu",
+    ["People Counter", "View/Delete Logs"], 
+   icons = [
+    'person-standing',              # People Counter
+    'file-earmark-text'             # View/Delete Logs
+    ], 
+    menu_icon="menu-up", 
+    default_index=0,orientation="horizontal"
+)
+    # tab1, tab2 = st.tabs(["People Counter", "View/Delete Logs"])
+    if add == 'People Counter':
         use_camera = st.checkbox("Use Live Camera")
-
-        # Initialize video capture based on user input
         cap = None
         if use_camera:
             cap = cv2.VideoCapture(0)
@@ -432,11 +436,9 @@ def peoplecounter():
         else:
             uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
             if uploaded_video is not None:
-                # Use BytesIO buffer for video file upload
                 video_bytes = uploaded_video.read()
                 cap = cv2.VideoCapture(cv2.VideoCapture(cv2.imdecode(np.frombuffer(video_bytes, np.uint8), cv2.IMREAD_COLOR)))
                 st.success('Successfully uploaded video!')
-
         if cap is not None:
             stframe = st.empty()
 
@@ -449,13 +451,13 @@ def peoplecounter():
                 if count % 2 != 0:
                     continue
 
-                # Resize frame for better performance
+          
                 frame = cv2.resize(frame, (900, 330))
 
-                # Predict objects using YOLO
+ 
                 results = model.predict(frame)
 
-                # Extract person detections
+      
                 a = results[0].boxes.data
                 px = pd.DataFrame(a).astype("float")
 
@@ -470,10 +472,9 @@ def peoplecounter():
                     if 'person' in c:
                         list_of_boxes.append([x1, y1, x2, y2])
 
-                # Update tracker with person bounding boxes
+           
                 bbox_id = tracker.update(list_of_boxes)
 
-                # Process each detected person
                 for bbox in bbox_id:
                     x3, y3, x4, y4, person_id = bbox
                     results = cv2.pointPolygonTest(np.array(area1, np.int32), (x4, y4), False)
@@ -491,7 +492,7 @@ def peoplecounter():
                                 entering.add(person_id)
                                 log_person_entry_exit(person_id, "entering")
 
-                    # Detect people exiting
+         
                     results2 = cv2.pointPolygonTest(np.array(area2, np.int32), (x4, y4), False)
                     if results2 >= 0:
                         people_exiting[person_id] = (x4, y4)
@@ -507,13 +508,13 @@ def peoplecounter():
                                 exiting.add(person_id)
                                 log_person_entry_exit(person_id, "exiting")
 
-                # Draw entry/exit areas
+           
                 cv2.polylines(frame, [np.array(area1, np.int32)], True, (255, 255, 255))
                 cv2.putText(frame, 'area1', (504, 471), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
                 cv2.polylines(frame, [np.array(area2, np.int32)], True, (255, 255, 255))
                 cv2.putText(frame, 'area2', (466, 485), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
 
-                # Display the counts
+   
                 Enter = len(entering)
                 Exit = len(exiting)
 
@@ -522,27 +523,24 @@ def peoplecounter():
                 cv2.putText(frame, 'Total Exit Person', (30, 50), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 255), 1)
                 cv2.putText(frame, str(Exit), (200, 50), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 255), 1)
 
-                # Display the current date and time on the video frame
+
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cv2.putText(frame, f'{current_time}', (680, 25), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 1)
 
-                # Display the video in Streamlit
+          
                 stframe.image(frame, channels="BGR", use_column_width=True)
 
             cap.release()
 
-    with tab2:
+    if add == 'View/Delete Logs':
         st.header("View and Delete Person Logs")
 
-        # View Table
         df = view_log()
-        st.dataframe(df)
+        st.dataframe(df,use_container_width=True)
 
-        # Delete row based on person_id
         person_id_to_delete = st.number_input("Enter Person ID to delete", min_value=0, step=1)
         if st.button("Delete Row"):
             delete_row(person_id_to_delete)
-            # Refresh the dataframe after deletion
             df = view_log()
             st.dataframe(df)
 

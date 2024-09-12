@@ -8,8 +8,15 @@ def dashboard():
 
     with st.sidebar:
         selected = option_menu("Dashboard Menu", 
-        ['Manage Attendance', 'ADD', 'Profile Setting', 'Logout'],
-        icons=['clipboard-check', 'person-plus', 'file-person', 'box-arrow-right'],
+        ['Manage Attendance', 
+         'ADD', 
+         'Profile Setting', 
+         'Logout'],
+
+        icons=['clipboard-check', 
+               'person-plus', 
+               'file-person', 
+               'box-arrow-right'],
         menu_icon="cast", default_index=0)
         conn = sqlite3.connect('Data/database.db')
         c = conn.cursor()
