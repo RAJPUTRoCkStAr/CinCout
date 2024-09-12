@@ -44,6 +44,20 @@ def generate_10_digit_id():
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
 ##############################################################################
+import platform
+
+
+if platform.system() == "Windows":
+    try:
+        # COM-related import
+        import win32com.client
+        
+        # COM-related functionality (e.g., Excel automation, Windows-specific tasks)
+        st.write("Running on Windows with COM functionality.")
+    except ImportError:
+        st.error("COM technology is not available on this platform.")
+else:
+    st.error("COM technology is only supported on Windows. Running on: " + platform.system())
 ##############################################################################
 ## Database
 def initialize_db():
