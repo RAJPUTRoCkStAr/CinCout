@@ -44,20 +44,34 @@ def generate_10_digit_id():
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
 ##############################################################################
+import pyttsx3
 import platform
+import streamlit as st
 
+# Function for text-to-speech (TTS)
+def tts(text):
+    # Check the platform (Windows or Linux)
+    if platform.system() == "Windows":
+        # Use Windows-specific driver
+        engine = pyttsx3.init(driverName='sapi5')
+    else:
+        # Use Linux driver (e.g., espeak)
+        engine = pyttsx3.init(driverName='espeak')
+    
+    # Set TTS properties (speed, voice, etc.)
+    rate = engine.getProperty('rate')
+    engine.setProperty('rate', 175)
+    
+    # Speak the text
+    engine.say(text)
+    engine.runAndWait()
 
-if platform.system() == "Windows":
-    try:
-        # COM-related import
-        import win32com.client
-        
-        # COM-related functionality (e.g., Excel automation, Windows-specific tasks)
-        st.write("Running on Windows with COM functionality.")
-    except ImportError:
-        st.error("COM technology is not available on this platform.")
-else:
-    st.error("COM technology is only supported on Windows. Running on: " + platform.system())
+# Example usage
+try:
+    tts("Congratulations! Your registration was successful.")
+except Exception as e:
+    st.error(f"Failed to use TTS: {e}")
+
 ##############################################################################
 ## Database
 def initialize_db():
