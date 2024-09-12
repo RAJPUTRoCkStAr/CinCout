@@ -22,8 +22,6 @@ def tts(text):
     # Determine the platform the app is running on
     if platform.system() == 'Windows':
         engine = pyttsx3.init(driverName='sapi5')  # Use Windows TTS engine
-    elif platform.system() == 'Linux':
-        engine = pyttsx3.init(driverName='espeak')  # Use eSpeak for Linux
     else:
         raise NotImplementedError(f"TTS not supported on {platform.system()} platform.")
     
