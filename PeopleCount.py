@@ -188,6 +188,7 @@
 
 # if __name__ == "__main__":
 #     peoplecounter()
+
 import cv2
 import pandas as pd
 import numpy as np
@@ -348,4 +349,5 @@ def peoplecounter():
 
         cap.release()
 
-
+if __name__ == "__main__":
+    peoplecounter()
