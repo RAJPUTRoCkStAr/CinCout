@@ -9,7 +9,7 @@ import sqlite3
 from datetime import datetime
 
 # Connect to SQLite database (creates the database if it doesn't exist)
-conn = sqlite3.connect('data/database.db', check_same_thread=False)
+conn = sqlite3.connect('Data/database.db', check_same_thread=False)
 db_cursor = conn.cursor()  # Use 'db_cursor' to avoid conflicts
 
 # Create table if it doesn't exist
