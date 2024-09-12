@@ -78,6 +78,7 @@ def title():
     st.markdown(html_temp, unsafe_allow_html=True)
     background_image = """
     <style>
+
     [data-testid="stAppViewContainer"] {
         background-image: url("https://cdn.dribbble.com/users/1116528/screenshots/6783134/_3.gif") !important;
         background-size: cover;

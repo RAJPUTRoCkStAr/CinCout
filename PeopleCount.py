@@ -8,34 +8,7 @@ from Utils import tts
 from datetime import datetime
 import sqlite3
 import torch
-import platform
-import pyttsx3
-import platform
-import streamlit as st
-
-# Function for text-to-speech (TTS)
-def tts(text):
-    # Check the platform (Windows or Linux)
-    if platform.system() == "Windows":
-        # Use Windows-specific driver
-        engine = pyttsx3.init(driverName='sapi5')
-    else:
-        # Use Linux driver (e.g., espeak)
-        engine = pyttsx3.init(driverName='espeak')
-    
-    # Set TTS properties (speed, voice, etc.)
-    rate = engine.getProperty('rate')
-    engine.setProperty('rate', 175)
-    
-    # Speak the text
-    engine.say(text)
-    engine.runAndWait()
-
-# Example usage
-try:
-    tts("Congratulations! Your registration was successful.")
-except Exception as e:
-    st.error(f"Failed to use TTS: {e}")
+# Initialize SQLite database for tracking data
 
 def initialize_db():
     try:
