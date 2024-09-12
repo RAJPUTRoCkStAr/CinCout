@@ -79,28 +79,28 @@ def title():
     background_image = """
     <style>
     [data-testid="stAppViewContainer"] {
-        background-image: url("https://www.refreshmentsystems.co.uk/app/uploads/2021/07/A-short-history-of-Facial-Recognition-01-1251x700.png")  !important;
+        background-image: url("https://cdn.dribbble.com/users/1116528/screenshots/6783134/_3.gif") !important;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
+        background-attachment: fixed; /* Keep the background fixed during scrolling */
+        height: 100vh; /* Full viewport height */
+        width: 100vw; /* Full viewport width */
+        overflow: hidden; /* Prevent scrolling for the container */
     }
-
     [data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.5);  /* Adds transparency to the sidebar */
+        height: 100vh; /* Ensure sidebar height is the same as the viewport */
     }
-
     [data-testid="stHeader"] {
-        background-color: rgba(0, 0, 0, 0);
+        background-color: rgba(0, 0, 0, 0); /* Transparent header */
     }
-
     [data-testid="stToolbar"] {
         right: 2rem;
     }
-
     button[kind="sidebar"] {
         background-color: transparent;  /* Ensures sidebar button is transparent */
     }
-
     </style>
     """
     st.markdown(background_image, unsafe_allow_html=True)
