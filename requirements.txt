@@ -9,3 +9,5 @@ ultralytics
 facenet-pytorch
 python-dotenv
 torch
+torchvision
+torchaudio
