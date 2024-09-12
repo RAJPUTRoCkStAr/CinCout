@@ -4,6 +4,7 @@ from PeopleCount import peoplecounter
 from Attendmain import search_attendance
 from Attendan import atten
 from Dashboard import dashboard
+from admin import view_database
 import streamlit as st
 title()
 
@@ -17,7 +18,7 @@ else:
     with st.sidebar:
         st.session_state.page = option_menu(
     "Main Menu",
-    ["Monitor", "Attendance", "Search Attendance", "Sign Up", "Login", "Contact Us"], 
+    ["Monitor", "Attendance", "Search Attendance", "Sign Up", "Login", "Contact Us","Admin"], 
     icons=['eye-fill', 'check2-square', 'search', 'plus-square', 'door-open', 'info-circle'], 
     menu_icon="menu-up", 
     default_index=0
@@ -40,3 +41,5 @@ else:
   
     elif st.session_state.page == "Contact Us":
         contact()
+    elif st.session_state.page == "Admin":
+        view_database()
