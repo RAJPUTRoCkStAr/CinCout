@@ -29,7 +29,7 @@ def dashboard():
             st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
         else:
             st.error("User data not found.")
-            tts("User data not found.")
+            # tts("User data not found.")
         conn.close()
 
     if selected == "Manage Attendance":
@@ -44,6 +44,6 @@ def dashboard():
         st.session_state.page = "Home"
         username = st.session_state.username
         name = extract_name(username)
-        tts(f"{name}, you have successfully logged out.")
+        # tts(f"{name}, you have successfully logged out.")
         st.rerun()
 

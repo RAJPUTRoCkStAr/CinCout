@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 from ultralytics import YOLO
 from src.tracker import Tracker
-from Utils import tts
+# from Utils import tts
 import sqlite3
 from datetime import datetime
 
@@ -72,13 +72,13 @@ def peoplecounter():
     if use_camera:
         cap = cv2.VideoCapture(1)
         st.success('Successfully live camera open 👏👏!')
-        tts('Successfully live camera open ')
+        # tts('Successfully live camera open ')
     else:
         uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
         if uploaded_video is not None:
             cap = cv2.VideoCapture(uploaded_video.name)
             st.success('Successfully uploaded video 👏👏!')
-            tts('Successfully uploaded video!')
+            # tts('Successfully uploaded video!')
 
     if cap is not None:
         stframe = st.empty()
