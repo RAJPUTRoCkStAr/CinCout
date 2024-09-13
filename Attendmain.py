@@ -204,7 +204,7 @@ mtcnn = MTCNN(
 ################################################################################
 ## View attendance
 def view_attendance():
-    st.markdown(f"<h4 style='text-align: center;color:white'>Attendance Records</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Attendance Records</h2>", unsafe_allow_html=True)
 
     df_combined = get_attendance_records()
     
@@ -480,6 +480,7 @@ def personadder():
 
 def search_attendance():
     st.header("Search Attendance Records")
+    st.markdown(f"<h2 style='text-align: center;color:white'>Search Attendance Records</h2>", unsafe_allow_html=True)
     
 
     search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
@@ -500,7 +501,7 @@ def search_attendance():
             st.warning(f"No records found for {search_type}: {search_input}")
 initialize_db()
 def search_attendance():
-    st.markdown(f"<h4 style='text-align: center;color:white'>Search Attendance Records</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Search Attendance Records</h2>", unsafe_allow_html=True)
 
     
     search_type = st.selectbox("Search by", ["Visitor ID", "Name"])

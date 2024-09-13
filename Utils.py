@@ -141,7 +141,7 @@ conn.commit()
 def signup(item):
     conn = sqlite3.connect('Data/database.db') 
     c = conn.cursor()
-    st.markdown(f"<h2 style='text-align: center;color:green'>Sign Up for {item} Management</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Sign Up for {item} Management</h2>", unsafe_allow_html=True)
     with st.form(key="signup_form", clear_on_submit=True):
         name = st.text_input("Enter your name")
         job_role = st.selectbox("Select your job role", job_roles[item])
@@ -188,7 +188,7 @@ def signup(item):
 def login(item):
     conn = sqlite3.connect('Data/database.db')
     c = conn.cursor()
-    st.markdown(f"<h2 style='text-align: center;color:green'>Log in Here 👇 for {item} Management</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Log in Here 👇 for {item} Management</h2>", unsafe_allow_html=True)
     with st.form(key="login_form", clear_on_submit=True):
         username = st.text_input("Enter your username")
         password = st.text_input("Enter your password", type="password")
@@ -520,7 +520,7 @@ def send_password_change_email(email):
 #########################################################################
 #profile setting
 def profilesetting():
-    st.markdown(f"<h2 style='text-align: center;color:green'>Profile Setting</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Profile Setting</h2>", unsafe_allow_html=True)
     selected2 = option_menu(None, ["Change Username", "Update Job Role", "Change Password"], 
     icons=['fill-person-fill', 'bookmark-star', "passport"], 
     menu_icon="cast", default_index=0, orientation="horizontal")
@@ -581,7 +581,7 @@ def send_thank_you_email(email, username, password, job_role, item, place_name):
 ##################################################################################
 ##Contact us 
 def contact():
-    st.markdown(f"<h2 style='text-align: center;color:green'>Contact us</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Contact us</h2>", unsafe_allow_html=True)
 
     with st.form(key="contact_form", clear_on_submit=True):
         name = st.text_input("Enter your name")
@@ -605,20 +605,21 @@ def contact():
         icons=['people', 'person-bounding-box'],
         menu_icon="microsoft-teams", default_index=0,orientation="horizontal")
     if select == 'Team':
-        st.header('Binary Coders',divider='rainbow')
+        st.markdown(f"<h2 style='text-align: center;color:white'>Binary Coders</h2>", unsafe_allow_html=True)
         st.balloons()
         st.write("""
         Welcome to the official website of Binary Coders! We are a dynamic team of four passionate tech enthusiasts, united by a shared vision of leveraging technology to solve real-world problems. Our latest project is an innovative attendance and activity detection system designed to streamline processes in hospitals, schools, universities, and offices.
         """)
         st.image('media/team.jpg',use_column_width=True,caption='Team Image')
         # Vision
-        st.subheader("Our Vision")
+        st.markdown(f"<h4 style='text-align: center;color:white'>Our Vision</h4>", unsafe_allow_html=True)
         st.write("""
         At Binary Coders, we believe in the transformative power of technology. Our current project aims to revolutionize the way attendance is marked and activities are monitored across various sectors. We are committed to delivering a solution that is not only innovative but also practical and easy to implement. By combining our diverse skill sets, we are creating a system that enhances efficiency, security, and accuracy, all while being user-friendly.
         """)
 
         # Why Choose Us?
-        st.subheader("Why Choose Us?")
+        # st.subheader("Why Choose Us?")
+        st.markdown(f"<h4 style='text-align: center;color:white'>Why Choose Us?</h4>", unsafe_allow_html=True)
         st.write("""
         - **Expertise Across Disciplines:** Each member of our team brings a unique set of skills and expertise to the table, ensuring that all aspects of the project are handled with the utmost professionalism.
         - **Innovation-Driven:** We are constantly exploring new technologies and methodologies to improve our solutions, ensuring that our system stays ahead of the curve.
@@ -627,8 +628,9 @@ def contact():
         """)
 
         # Closing
+       
+        st.markdown(f"<h4 style='text-align: center;color:white'>Join Us in Our Journey?</h4>", unsafe_allow_html=True)
         st.write("""
-        ### Join Us on Our Journey
         We invite you to follow our progress as we work to bring this project to life. Whether you're a potential partner, client, or simply someone who shares our passion for technology, we're excited to have you with us on this journey.
         """)
     if select == 'Individual':
@@ -655,8 +657,7 @@ def contact():
             ]
         }
     )
-
-        st.header('Team Individual Profiles')
+        st.markdown(f"<h2 style='text-align: center;color:white'>Team Individual Profiles</h2>", unsafe_allow_html=True)
         edited_df = st.data_editor(
         data_df,
         column_config={
