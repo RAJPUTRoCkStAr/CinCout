@@ -204,7 +204,7 @@ mtcnn = MTCNN(
 ################################################################################
 ## View attendance
 def view_attendance():
-    st.markdown(f"<h4 style='text-align: center;color:green'>Attendance Records</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='text-align: center;color:white'>Attendance Records</h4>", unsafe_allow_html=True)
 
     df_combined = get_attendance_records()
     
@@ -249,14 +249,14 @@ def view_registered_persons():
     if df.empty:
         st.warning("No registered persons found.")
         return
-    st.markdown(f"<h4 style='text-align: center;color:green'>Registered Persons List</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='text-align: center;color:white'>Registered Persons List</h4>", unsafe_allow_html=True)
 
     
     st.dataframe(df[['Unique_ID', 'Name', 'Email','Workplace', 'job_role']], use_container_width=True, hide_index=True)
 ###############################################################################
 ## marking attendance
 def Takeattendance():
-    st.markdown(f"<h2 style='text-align: center;color:green'>Mark your Attendance</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Mark your Attendance</h2>", unsafe_allow_html=True)
     visitor_id = st.text_input("Enter your Unique ID:", '')
     if not visitor_id:
         st.error("Please enter your Unique ID.")
@@ -500,7 +500,7 @@ def search_attendance():
             st.warning(f"No records found for {search_type}: {search_input}")
 initialize_db()
 def search_attendance():
-    st.markdown(f"<h4 style='text-align: center;color:green'>Search Attendance Records</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='text-align: center;color:white'>Search Attendance Records</h4>", unsafe_allow_html=True)
 
     
     search_type = st.selectbox("Search by", ["Visitor ID", "Name"])

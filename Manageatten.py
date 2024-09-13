@@ -10,7 +10,7 @@ def manageatt():
     name = extract_name(username).capitalize()
     c.execute('SELECT email, job_role, password, item FROM users WHERE username = ?', (username,))
     user_data = c.fetchone()
-    st.markdown(f"<h2 style='text-align: center;color:green'>Welcome {name}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align: center;color:white'>Welcome {name}</h2>", unsafe_allow_html=True)
     select = option_menu(None, ["Registered person", "Recent Attendance","Search Attendance"], 
         icons=['people','clipboard-pulse','search'], orientation="horizontal",menu_icon="cast", default_index=0)
     if select == "Registered person":

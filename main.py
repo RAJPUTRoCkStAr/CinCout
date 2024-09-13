@@ -4,7 +4,7 @@ from PeopleCount import peoplecounter
 from Attendmain import search_attendance
 from Attendan import atten
 from Dashboard import dashboard
-from admin import view_database
+from Admin import view_database
 import streamlit as st
 title()
 

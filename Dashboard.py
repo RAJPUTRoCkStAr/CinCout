@@ -42,7 +42,7 @@ def dashboard():
     if selected == "Manage Attendance":
         manageatt()
     elif selected == "ADD":
-        st.markdown(f"<h2 style='text-align: center;color:green'>Register a person for Attendance</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='text-align: center;color:white'>Register a person for Attendance</h2>", unsafe_allow_html=True)
         personadder()
     elif selected == "Profile Setting":
         profilesetting()

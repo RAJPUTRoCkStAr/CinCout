@@ -415,7 +415,8 @@ def peoplecounter():
     exiting = set()
 
 
-    st.title("Person Counting and Log Viewer")
+    # st.title("Person Counting and Log Viewer")
+    st.markdown(f"<h2 style='text-align: center;color:white'>Person Counting and Log Viewer</h2>", unsafe_allow_html=True)
     add = option_menu(
     "Main Menu",
     ["People Counter", "View/Delete Logs"], 
@@ -533,8 +534,8 @@ def peoplecounter():
             cap.release()
 
     if add == 'View/Delete Logs':
-        st.header("View and Delete Person Logs")
-
+        # st.header("View and Delete Person Logs")
+        st.markdown(f"<h2 style='text-align: center;color:white'View and Delete Person Logs</h2>", unsafe_allow_html=True)
         df = view_log()
         st.dataframe(df,use_container_width=True)
 
