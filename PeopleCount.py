@@ -77,7 +77,7 @@ def peoplecounter():
         use_camera = st.checkbox("Use Live Camera")
         cap = None
         if use_camera:
-            cap = cv2.VideoCapture(0)
+            cap = cv2.VideoCapture(1)
             st.success('Successfully opened live camera!')
         else:
             st.info("You are not using camera !")
