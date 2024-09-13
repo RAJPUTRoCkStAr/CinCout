@@ -30,7 +30,8 @@ narwhals
 networkx
 numpy
 opencv-python
-opencv-python-headless
+opencv-python-headless==4.10
+
 packaging
 pandas
 pillow
