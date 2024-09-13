@@ -435,11 +435,12 @@ def peoplecounter():
             cap = cv2.VideoCapture(0)
             st.success('Successfully opened live camera!')
         else:
-            uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
-            if uploaded_video is not None:
-                video_bytes = uploaded_video.read()
-                cap = cv2.VideoCapture(cv2.VideoCapture(cv2.imdecode(np.frombuffer(video_bytes, np.uint8), cv2.IMREAD_COLOR)))
-                st.success('Successfully uploaded video!')
+            st.info("You are not using camera !")
+            # uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
+            # if uploaded_video is not None:
+            #     video_bytes = uploaded_video.read()
+            #     cap = cv2.VideoCapture(cv2.VideoCapture(cv2.imdecode(np.frombuffer(video_bytes, np.uint8), cv2.IMREAD_COLOR)))
+            #     st.success('Successfully uploaded video!')
         if cap is not None:
             stframe = st.empty()
 
@@ -535,15 +536,16 @@ def peoplecounter():
 
     if add == 'View/Delete Logs':
         # st.header("View and Delete Person Logs")
-        st.markdown(f"<h2 style='text-align: center;color:white'View and Delete Person Logs</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='text-align: center;color:white'>View People Count</h2>", unsafe_allow_html=True)
         df = view_log()
-        st.dataframe(df,use_container_width=True)
-
+        st.dataframe(df,use_container_width=True,hide_index=True,)
+        st.markdown(f"<h2 style='text-align: center;color:white'>Delete People Count by Person ID</h2>", unsafe_allow_html=True)
         person_id_to_delete = st.number_input("Enter Person ID to delete", min_value=0, step=1)
         if st.button("Delete Row"):
             delete_row(person_id_to_delete)
+            
             df = view_log()
-            st.dataframe(df)
+            st.dataframe(df,use_container_width=True,hide_index=True)
 
 if __name__ == "__main__":
     peoplecounter()

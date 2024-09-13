@@ -29,7 +29,7 @@ else:
     'gear'             # Admin
     ], 
     menu_icon="menu-up", 
-    default_index=0
+    default_index=0,
 )
     
     if st.session_state.page == "Monitor":

@@ -4,8 +4,7 @@ import streamlit as st
 
 def view_database():
     database_path = 'Data/database.db'
-    
-    st.title("Database Viewer")
+    st.markdown(f"<h1 style='text-align: center;color:white'>Database Viewer</h1>", unsafe_allow_html=True)
 
     # Authentication
     if 'authenticated' not in st.session_state:
