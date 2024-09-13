@@ -94,7 +94,7 @@ def title():
         height: 100vh; /* Ensure sidebar height is the same as the viewport */
     }
     [data-testid="stHeader"] {
-        background-color: transparent; /* Transparent header */
+        background-color: rgba(0, 0, 0, 0); /* Transparent header */
     }
     [data-testid="stToolbar"] {
         right: 2rem;
