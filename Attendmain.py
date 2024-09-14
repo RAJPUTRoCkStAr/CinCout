@@ -36,11 +36,15 @@ DB_PATH     = os.path.join(ROOT_DIR, "Data/database.db")
 ####################################################################################
 #################################################################################
 ## Common function for attendance system
-def generate_10_digit_id():
-    uuid_int = uuid.uuid4().int
-    alphanumeric_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    numeric_part = str(uuid_int % 1000000).zfill(4)
-    return alphanumeric_id + numeric_part
+def generate_workplace_id(school_name):
+    sanitized_name = ''.join(char for char in school_name.upper() if char.isalnum())
+    prefix = sanitized_name[:3]  
+    if len(prefix) < 3:
+        prefix = prefix.ljust(3, 'X')
+    numeric_part = ''.join(random.choices(string.digits, k=5))
+    return prefix + numeric_part
+
+
 def BGR_to_RGB(image_in_array):
     return cv2.cvtColor(image_in_array, cv2.COLOR_BGR2RGB)
 ##############################################################################
@@ -56,7 +60,7 @@ def initialize_db():
 
     cursor.execute(f'''
     CREATE TABLE IF NOT EXISTS visitors (
-        Unique_ID TEXT PRIMARY KEY,
+        Unique_ID INTEGER PRIMARY KEY,
         Name TEXT NOT NULL,
         Email TEXT NOT NULL UNIQUE,
         Workplace TEXT NOT NULL,
@@ -400,6 +404,9 @@ def personadder():
     }
 
     workplace = st.session_state.get('work_place', None)
+    workplace_name = st.session_state.get('workplace_name', None)
+    # st.subheader(workplace)
+    # st.subheader(workplace_name)
 
     if workplace:
         job_roles = roles.get(workplace, [])
@@ -441,7 +448,7 @@ def personadder():
             st.error("This email is already associated with another person. Please enter a different email.")
             return
 
-        unique_id = generate_10_digit_id()
+        unique_id = generate_workplace_id(workplace_name)
         image_array = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
         if image_array is None:
@@ -505,7 +512,7 @@ def search_attendance():
 
     
     search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
-    search_input = st.text_input(f"Enter {search_type} to search:", '')
+    search_input = st.text_input(f"Enter Visitor ID to search:", '')
 
     searchatt = st.button('Search Attendance',use_container_width=True,type='primary')
     clearatt = st.button('Clear Recent Attendance',use_container_width=True,type='secondary')

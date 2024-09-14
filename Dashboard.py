@@ -22,17 +22,19 @@ def dashboard():
         c = conn.cursor()
         username = st.session_state.username
         name = extract_name(username)
-        c.execute('SELECT email, job_role, password, item FROM users WHERE username = ?', (username,))
+        c.execute('SELECT email, job_role, password,place_name,item FROM users WHERE username = ?', (username,))
         user_data = c.fetchone()
         if user_data:
-            email, job_role, current_password, work_place = user_data
+            email, job_role, current_password,workplace_name,work_place = user_data
             st.session_state.work_place = work_place
+            st.session_state.workplace_name = workplace_name
             st.markdown(f"<h2 style='text-align: center;'>Personal Information</h2>", unsafe_allow_html=True)
             st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
             st.markdown(f"**👤 Username:** `{username}`")
             st.markdown(f"**📧 Email:** `{email}`")
             st.markdown(f"**💼 Job Role:** `{job_role}`")
             st.markdown(f"**🏢 Workplace:** `{work_place}`")
+            st.markdown(f"**📍 Workplace_name:** `{workplace_name}`")
             st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
         else:
             st.error("User data not found.")
