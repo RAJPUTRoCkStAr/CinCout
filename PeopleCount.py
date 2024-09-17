@@ -30,6 +30,12 @@ def delete_row(person_id):
     db_cursor.execute("DELETE FROM person_log WHERE person_id = ?", (person_id,))
     conn.commit()
     st.success(f"Deleted person with ID {person_id}")
+def test_camera(index):
+    cap = cv2.VideoCapture(index)
+    if not cap.isOpened():
+        st.error(f"Failed to open camera at index {index}")
+        return False
+    return True
 def peoplecounter():
     model = YOLO('yolov10n.pt')
     # Define the areas for entry and exit detection (top-left, top-right, bottom-right, bottom-left corners)
@@ -58,10 +64,11 @@ def peoplecounter():
         use_camera = st.checkbox("Use Live Camera")
         cap = None
         if use_camera:
-            cap = cv2.VideoCapture(1)
-            st.success('Successfully opened live camera!')
-        else:
-            st.info("You are not using camera !")
+            if test_camera(0):
+                cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+                st.success('Successfully opened live camera!')
+            else:
+                st.error('Camera not accessible. Please check your camera settings.')
             # uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
             # if uploaded_video is not None:
             #     video_bytes = uploaded_video.read()
