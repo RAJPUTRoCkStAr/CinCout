@@ -69,11 +69,11 @@ def peoplecounter():
                 st.success('Successfully opened live camera!')
             else:
                 st.error('Camera not accessible. Please check your camera settings.')
-            uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
-            if uploaded_video is not None:
-                video_bytes = uploaded_video.read()
-                cap = cv2.VideoCapture(cv2.VideoCapture(cv2.imdecode(np.frombuffer(video_bytes, np.uint8), cv2.IMREAD_COLOR)))
-                st.success('Successfully uploaded video!')
+            # uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
+            # if uploaded_video is not None:
+            #     video_bytes = uploaded_video.read()
+            #     cap = cv2.VideoCapture(cv2.VideoCapture(cv2.imdecode(np.frombuffer(video_bytes, np.uint8), cv2.IMREAD_COLOR)))
+            #     st.success('Successfully uploaded video!')
         if cap is not None:
             stframe = st.empty()
             count = 0
