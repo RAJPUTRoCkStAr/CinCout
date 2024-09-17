@@ -65,7 +65,7 @@ def peoplecounter():
         cap = None
         if use_camera:
             if test_camera(0):
-                cap = cv2.VideoCapture(0)
+                cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
                 st.success('Successfully opened live camera!')
             else:
                 st.error('Camera not accessible. Please check your camera settings.')
