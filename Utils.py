@@ -80,7 +80,7 @@ def title():
     <style>
 
     [data-testid="stAppViewContainer"] {
-        background-image: url("https://cdn.dribbble.com/users/1116528/screenshots/6783134/_3.gif") !important;
+        background-image: url("https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/media/background.gif") !important;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -105,20 +105,18 @@ def title():
     </style>
     """
     st.markdown(background_image, unsafe_allow_html=True)
-
-
-#     st.markdown("""
-#     <style>
-#         .reportview-container {
-#             margin-top: -2em;
-#         }
-#         #MainMenu {visibility: hidden;}
-#         .stDeployButton {display:none;}
-#         footer {visibility: hidden;}
-#         #stDecoration {display:none;}
-#         header {visibility: hidden;}
-#     </style>
-# """, unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+        .reportview-container {
+            margin-top: -2em;
+        }
+        #MainMenu {visibility: hidden;}
+        .stDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+        header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
     
 #################################################################################
 #database connection

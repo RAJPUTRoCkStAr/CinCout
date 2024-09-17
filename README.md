@@ -61,15 +61,61 @@ Finally, to start the application, navigate to the face directory and run the St
 cd face     
 python -m streamlit run main.py
 ```
+### 3.5 Running the Application with Docker
+
+If you'd like to use Docker for easier deployment, follow these steps:
+
+#### 3.5.1 Build the Docker Image
+
+First, build the Docker image using the provided Dockerfile:
+
+```bash
+docker build -t cincout-face-attendace:latest .
+```
+### 3.5.2 Run the Docker Container
+To run the application in Docker, map port 8501 from the container to your local machine:
+
+```bash
+docker run -p 8501:8501 cincout-face-attendace:latest
+```
+
+### 3.5.3 Access the Application
+Open your browser and navigate to [http://localhost:8501](http://localhost:8501) to access the Streamlit app.
+
+### 3.6 Running the Application from Docker Hub
+
+If you don't want to build the image locally, you can pull it directly from Docker Hub.
+
+
+#### 3.6.1 Pull the Docker Image
+
+To pull the Docker image from Docker Hub, run:
+
+```bash
+docker pull sumitkumarsingh22/cincout-face-attendace:latest
+```
+### 3.6.2 Run the Docker Container
+
+To run the application in Docker, map port 8501 from the container to your local machine:
+
+```bash
+docker run -p 8501:8501 cincout-face-attendace:latest
+```
+### 3.6.3 Access the Application
+Open your browser and navigate to [http://localhost:8501](http://localhost:8501) to access the Streamlit app.
+
     
 ## **4. Project Structure**
 The project structure is designed to facilitate easy navigation and organization of the codebase.
 ```bash
 ├── Human-Activity/
+├── .streamlit/
+│   ├── config.toml
+│   ├── secrets.toml
 ├── docs/
 │   ├── HRM.pdf
 │   ├── Human-Activity-Detection-Project.pptx
-│   └── ABC.Docs
+│   └── Project Documentation.docx
 │── .streamlit/
 │   └── config.toml
 │── data/
@@ -90,29 +136,33 @@ The project structure is designed to facilitate easy navigation and organization
 │   │   ├── functional.py
 │   │   └── transform.py
 │   └── model_lib/
-│       ├── MiniFASNet.py
-│       ├── MultiFTNet.py
-│       ├── anti_spoof_predict.py
-│       ├── default_config.py
-│       ├── generate_patches.py
-│       ├── tracker.py
-│       ├── train_main.py
-│       └── utility.py
+│   │    ├── MiniFASNet.py
+│   │    ├── MultiFTNet.py
+│   │
+│   ├── anti_spoof_predict.py
+│   ├── default_config.py
+│   ├── generate_patches.py
+│   ├── tracker.py
+│   ├── train_main.py
+│   └── utility.py
 │── testing/
 │   └── videos/
 │── visitor_database/
 │   └── visitor Images/
 │── Visitor_history/
 │   └── Visitor history Images/
+│── Admin.py
 │── attendaminaprac.py
 │── Attendan.py
 │── Attendmain.py
 │── class.py
 │── coco.txt
-│── dash.py
-│── data.yaml
+│── Dashboard.py
+│── Dockerfile
 │── main.py
 │── Manageatten.py
+│── PeopleCount.py
+│── test_1.mp4
 │── test.py
 │── train.py
 │── utils.py
