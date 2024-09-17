@@ -34,7 +34,7 @@ def dashboard():
             st.markdown(f"**📧 Email:** `{email}`")
             st.markdown(f"**💼 Job Role:** `{job_role}`")
             st.markdown(f"**🏢 Workplace:** `{work_place}`")
-            st.markdown(f"**📍 Workplace_name:** `{workplace_name}`")
+            st.markdown(f"**📍 Workplace_name:** `{workplace_name.capitalize()}`")
             st.markdown("<hr style='border-top: 2px solid #bbb;'>", unsafe_allow_html=True)
         else:
             st.error("User data not found.")

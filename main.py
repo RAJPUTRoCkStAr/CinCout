@@ -1,5 +1,5 @@
 from streamlit_option_menu import option_menu
-from Utils import title,contact,login,signup
+from Utils import title,contact,login,signup,admin_login
 from PeopleCount import peoplecounter
 from Attendmain import search_attendance
 from Attendan import atten
@@ -8,12 +8,34 @@ from Admin import view_database
 import streamlit as st
 title()
 
+
+# query_params = st.experimental_get_query_params()
+
+# url_page = query_params.get("page", ["home"])[0]
+
+# if 'logged_in' not in st.session_state:
+#     st.session_state.logged_in = False
+
+# if url_page == "admin":
+#     admin_login()
+#     if st.session_state.log_in:
+#         view_database()
+#         st.rerun()
+
+
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'page' not in st.session_state:
     st.session_state.page = "Home"
 if st.session_state.logged_in:
     dashboard()
+
+if 'log_in' not in st.session_state:
+    st.session_state.log_in = False
+if 'pag' not in st.session_state:
+    st.session_state.pag = "Home"
+if st.session_state.log_in:
+    view_database()
 else:
     with st.sidebar:
         st.session_state.page = option_menu(
@@ -50,4 +72,4 @@ else:
     elif st.session_state.page == "Contact Us":
         contact()
     elif st.session_state.page == "Admin":
-        view_database()
+        admin_login()

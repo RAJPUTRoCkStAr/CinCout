@@ -192,8 +192,8 @@ def login(item):
     with st.form(key="login_form", clear_on_submit=True):
         username = st.text_input("Enter your username")
         password = st.text_input("Enter your password", type="password")
-        forgot_password_button = st.form_submit_button("Forgot Password")
         login_button = st.form_submit_button("Login")
+        forgot_password_button = st.form_submit_button("Forgot Password")
         
         if forgot_password_button:
             if username:
@@ -239,8 +239,8 @@ def send_password_reset_email(email, new_password):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_username = st.secrets["smtp"]["username"]
+        smtp_password = st.secrets["smtp"]["password"]
         
         message = MIMEMultipart()
         message['From'] = smtp_username
@@ -321,8 +321,8 @@ def send_username_change_email(email, new_username):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_username = st.secrets["smtp"]["username"]
+        smtp_password = st.secrets["smtp"]["password"]
         
         message = MIMEMultipart()
         message['From'] = smtp_username
@@ -401,8 +401,8 @@ def send_job_role_change_email(email, new_job_role):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_username = st.secrets["smtp"]["username"]
+        smtp_password = st.secrets["smtp"]["password"]
         
         message = MIMEMultipart()
         message['From'] = smtp_username
@@ -483,8 +483,8 @@ def send_password_change_email(email):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_username = st.secrets["smtp"]["username"]
+        smtp_password = st.secrets["smtp"]["password"]
         
         message = MIMEMultipart()
         message['From'] = smtp_username
@@ -538,8 +538,8 @@ def send_thank_you_email(email, username, password, job_role, item, place_name):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_username = st.secrets["smtp"]["username"]
+        smtp_password = st.secrets["smtp"]["password"]
         message = MIMEMultipart()
         message['From'] = smtp_username
         message['To'] = email
@@ -650,10 +650,10 @@ def contact():
                 "https://github.com/Madanedunet"
             ],
             "apps": [
-                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/sumitimg.jpg",
-                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_mantuimg.jpg",
-                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_mayankimg.jpg",
-                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/face-det/media/resized_madanimg.jpg"
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/media/sumitimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/media/resized_mantuimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/media/resized_mayankimg.jpg",
+                "https://raw.githubusercontent.com/RAJPUTRoCkStAr/Human-activity/main/media/resized_madanimg.jpg"
             ]
         }
     )
@@ -678,9 +678,9 @@ def send_contact_email(name, email, subject, message):
     try:
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = os.getenv('SMTP_USERNAME')
-        smtp_password = os.getenv('SMTP_PASSWORD')
-        recipient_email = "luciferdevil565656@gmail.com"  # Replace with your contact email address
+        smtp_username = st.secrets["smtp"]["username"]
+        smtp_password = st.secrets["smtp"]["password"]
+        recipient_email = "luciferdevil565656@gmail.com" 
 
         mail_content = f"""
         <html>
@@ -717,3 +717,29 @@ def send_contact_email(name, email, subject, message):
     except Exception as e:
         tts(f"Failed to send email: {e}")
         st.error(f"Failed to send email: {e}")
+##################################################################################
+#admin login
+admin_users = st.secrets["admin"].get("users", [])
+
+def authenticate(username, password):
+    for user in admin_users:
+        if user["username"] == username and user["password"] == password:
+            return True
+    return False
+
+def admin_login():
+    st.markdown("<h2 style='text-align: center;color:white'>Login for Admin</h2>", unsafe_allow_html=True)
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if authenticate(username, password):
+            st.session_state['log_in'] = True
+            st.session_state['page'] = "Admin"
+            st.session_state['authenticated'] = True
+            st.success("Logged in successfully!")
+            st.experimental_rerun()  # Refresh the page to reflect changes
+        else:
+            st.error("Invalid credentials")
+    else:
+        st.info("Please log in to see Database")

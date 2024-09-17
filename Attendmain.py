@@ -261,7 +261,7 @@ def view_registered_persons():
 ## marking attendance
 def Takeattendance():
     st.markdown(f"<h2 style='text-align: center;color:white'>Mark your Attendance</h2>", unsafe_allow_html=True)
-    visitor_id = st.text_input("Enter your Unique ID:", '')
+    visitor_id = st.text_input("Enter your Unique ID:", '',max_chars=8)
     if not visitor_id:
         st.error("Please enter your Unique ID.")
         return
@@ -349,8 +349,8 @@ def Takeattendance():
             st.error('No human face detected.')
 
 def send_email(recipient_email, subject, body,unique_id):
-    sender_email = os.getenv('SMTP_USERNAME')
-    sender_password = os.getenv('SMTP_PASSWORD')
+    sender_email =  st.secrets["smtp"]["username"]
+    sender_password = st.secrets["smtp"]["password"]
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -486,33 +486,11 @@ def personadder():
 ### search attendance
 
 def search_attendance():
-    st.header("Search Attendance Records")
-    st.markdown(f"<h2 style='text-align: center;color:white'>Search Attendance Records</h2>", unsafe_allow_html=True)
-    
-
-    search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
-    search_input = st.text_input(f"Enter {search_type} to search:", '')
-    
-    if search_input:
-        df_combined = get_attendance_records()
-        
-        if search_type == "Visitor ID":
-            search_results = df_combined[df_combined['ID'] == search_input]
-        else:
-            search_results = df_combined[df_combined['visitor_name'].str.contains(search_input, case=False, na=False)]
-        
-        if not search_results.empty:
-            st.write("### Search Results")
-            st.dataframe(search_results)
-        else:
-            st.warning(f"No records found for {search_type}: {search_input}")
-initialize_db()
-def search_attendance():
     st.markdown(f"<h2 style='text-align: center;color:white'>Search Attendance Records</h2>", unsafe_allow_html=True)
 
     
-    search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
-    search_input = st.text_input(f"Enter Visitor ID to search:", '')
+    # search_type = st.selectbox("Search by", ["Visitor ID", "Name"])
+    search_input = st.text_input(f"Enter Visitor ID to search:", '',max_chars=8)
 
     searchatt = st.button('Search Attendance',use_container_width=True,type='primary')
     clearatt = st.button('Clear Recent Attendance',use_container_width=True,type='secondary')
@@ -520,11 +498,11 @@ def search_attendance():
         clearrecenthistory()
     if searchatt:
         df_combined = get_attendance_records()
+        search_results = df_combined[df_combined['ID'] == search_input]
         
-        if search_type == "Visitor ID":
-            search_results = df_combined[df_combined['ID'] == search_input]
-        else:
-            search_results = df_combined[df_combined['visitor_name'].str.contains(search_input, case=False, na=False)]
+        # if search_type == "Visitor ID":
+        # else:
+        #     search_results = df_combined[df_combined['visitor_name'].str.contains(search_input, case=False, na=False)]
         
         if not search_results.empty:
             st.write("### Search Results")
@@ -555,7 +533,7 @@ def search_attendance():
             except Exception as e:
                 st.error(f"Error displaying search results: {e}")
         else:
-            st.warning(f"No records found for {search_type}: {search_input}")
+            st.warning(f"No records found for Visitor ID: {search_input}")
 
 initialize_db()
 ###############################################################################

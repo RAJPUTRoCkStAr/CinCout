@@ -14,7 +14,6 @@ warnings.filterwarnings('ignore')
 SAMPLE_IMAGE_PATH = "./images/sample/"
 
 
-
 def check_image(image):
     height, width, channel = image.shape
     if width/height != 3/4:
