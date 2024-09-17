@@ -736,7 +736,7 @@ def admin_login():
             st.session_state['page'] = "Admin"
             st.session_state['authenticated'] = True
             st.success("Logged in successfully!")
-            st.experimental_rerun()  # Refresh the page to reflect changes
+            st.rerun()  # Refresh the page to reflect changes
         else:
             st.error("Invalid credentials")
     else:
