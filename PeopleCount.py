@@ -63,12 +63,19 @@ def peoplecounter():
     if add == 'People Counter':
         use_camera = st.checkbox("Use Live Camera")
         cap = None
-        if use_camera:
-            if test_camera(0):
-                cap = cv2.VideoCapture(0)
-                st.success('Successfully opened live camera!')
+        for index in range(5):
+            cap = cv2.VideoCapture(index)
+            if cap.isOpened():
+                print(f"Camera found at index {index}")
+                cap.release()
             else:
-                st.error('Camera not accessible. Please check your camera settings.')
+                print(f"Failed to open camera at index {index}")
+        # if use_camera:
+        #     if test_camera(0):
+        #         cap = cv2.VideoCapture(0)
+        #         st.success('Successfully opened live camera!')
+        #     else:
+        #         st.error('Camera not accessible. Please check your camera settings.')
             # uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
             # if uploaded_video is not None:
             #     video_bytes = uploaded_video.read()
