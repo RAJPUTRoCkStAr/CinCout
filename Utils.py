@@ -105,18 +105,18 @@ def title():
     </style>
     """
     st.markdown(background_image, unsafe_allow_html=True)
-    st.markdown("""
-    <style>
-        .reportview-container {
-            margin-top: -2em;
-        }
-        #MainMenu {visibility: hidden;}
-        .stDeployButton {display:none;}
-        footer {visibility: hidden;}
-        #stDecoration {display:none;}
-        header {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
+#     st.markdown("""
+#     <style>
+#         .reportview-container {
+#             margin-top: -2em;
+#         }
+#         #MainMenu {visibility: hidden;}
+#         .stDeployButton {display:none;}
+#         footer {visibility: hidden;}
+#         #stDecoration {display:none;}
+#         header {visibility: hidden;}
+#     </style>
+# """, unsafe_allow_html=True)
     
 #################################################################################
 #database connection
@@ -177,7 +177,8 @@ def signup(item):
                         c.execute('INSERT INTO users (name, job_role, email, username, password, item, place_name) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                                   (name, job_role, email, username, password, item, place_name))
                         conn.commit()
-                        send_thank_you_email(email, username, password, job_role, item, place_name)
+                        with st.spinner("Processing your registration... Please wait while we send you a confirmation email."):
+                            send_thank_you_email(email, username, password, job_role, item, place_name)
                     else:
                         st.error('Username already exists. Please try again.')
                         tts('Username already exists. Please try again.')
@@ -727,7 +728,7 @@ def authenticate(username, password):
 
 def admin_login():
     st.markdown("<h2 style='text-align: center;color:white'>Login for Admin</h2>", unsafe_allow_html=True)
-    username = st.text_input("Username")
+    username = st.text_input("Username",key="username_admin")
     password = st.text_input("Password", type="password")
 
     if st.button("Login"):
@@ -736,7 +737,7 @@ def admin_login():
             st.session_state['page'] = "Admin"
             st.session_state['authenticated'] = True
             st.success("Logged in successfully!")
-            st.rerun()  # Refresh the page to reflect changes
+            st.rerun()  
         else:
             st.error("Invalid credentials")
     else:
