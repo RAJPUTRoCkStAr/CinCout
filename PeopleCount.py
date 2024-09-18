@@ -61,41 +61,15 @@ def peoplecounter():
     default_index=0,orientation="horizontal"
 )    
     if add == 'People Counter':
-        input_option = st.radio(
-            "Select Input Source:",
-            ('Camera (Index 0/1)', 'Video Stream URL')
-        )
-
+        use_camera = st.checkbox("Use Live Camera")
         cap = None
-
-        if input_option == 'Camera (Index 0/1)':
-            camera_index = st.selectbox("Select Camera Index:", [0, 1])
-            if st.button("Start Camera"):
-                if test_camera(camera_index):
-                    cap = cv2.VideoCapture(camera_index)
-                    st.success(f'Successfully opened camera at index {camera_index}!')
-                else:
-                    st.error(f'Camera at index {camera_index} not accessible. Please check your camera settings.')
-        
-        elif input_option == 'Video Stream URL':
-            stream_url = st.text_input("Enter Video Stream URL (RTSP/HTTP):")
-            if stream_url:
-                if st.button("Start Stream"):
-                    cap = cv2.VideoCapture(stream_url)
-                    if cap.isOpened():
-                        st.success(f'Successfully opened video stream from URL: {stream_url}!')
-                    else:
-                        st.error('Failed to open video stream. Please check the URL.')
-    # if add == 'People Counter':
-    #     use_camera = st.checkbox("Use Live Camera")
-    #     cap = None
-    #     cam_url = ""
-    #     if use_camera:
-    #         if test_camera(0):
-    #             cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-    #             st.success('Successfully opened live camera!')
-    #         else:
-    #             st.error('Camera not accessible. Please check your camera settings.')
+        cam_url = ""
+        if use_camera:
+            if test_camera(0):
+                cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+                st.success('Successfully opened live camera!')
+            else:
+                st.error('Camera not accessible. Please check your camera settings.')
             # uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
             # if uploaded_video is not None:
             #     video_bytes = uploaded_video.read()
