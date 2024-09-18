@@ -1,0 +1,49 @@
+we can check the in time and out time if the outime is above 4 hours he is going in half day or out time is 8 hours he is going in full time 
+than add a table if the person is taking halfday or full day column name can be what_day?
+
+
+
+import streamlit as st
+import cv2
+import numpy as np
+from PIL import Image
+
+# Initialize the video capture
+def process_frame(frame):
+    # Example processing function: convert to grayscale
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    return gray_frame
+
+def main():
+    st.title("Real-Time Video Capture and Processing")
+
+    camera = st.camera_input("Capture Video")
+
+    if camera:
+        # Read video data from the camera input
+        st.write("Camera is active. Processing video frames...")
+        
+        # Create a placeholder for the video feed
+        stframe = st.empty()
+
+        while True:
+            frame = camera.read()  # Capture a frame
+            if frame is None:
+                break
+            
+            # Convert the frame from bytes to a numpy array
+            img_array = np.array(Image.open(frame))
+            
+            # Process the frame (e.g., using OpenCV)
+            processed_frame = process_frame(img_array)
+            
+            # Convert processed frame back to image format for display
+            processed_image = Image.fromarray(processed_frame)
+
+            # Display the processed frame
+            stframe.image(processed_image, channels="GRAY", use_column_width=True)
+    else:
+        st.write("No camera input detected.")
+
+if __name__ == "__main__":
+    main()

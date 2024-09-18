@@ -7,6 +7,10 @@ from ultralytics import YOLO
 from src.tracker import Tracker
 import sqlite3
 from datetime import datetime
+from PIL import Image
+import io
+
+# Database setup
 conn = sqlite3.connect('Data/database.db', check_same_thread=False)
 db_cursor = conn.cursor()
 db_cursor.execute('''
@@ -17,30 +21,28 @@ CREATE TABLE IF NOT EXISTS person_log (
 )
 ''')
 conn.commit()
+
 def log_person_entry_exit(person_id, status):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     db_cursor.execute("INSERT INTO person_log (person_id, status, timestamp) VALUES (?, ?, ?)", (person_id, status, timestamp))
     conn.commit()
+
 def view_log():
     db_cursor.execute("SELECT * FROM person_log")
     data = db_cursor.fetchall()
     df = pd.DataFrame(data, columns=["person_id", "status", "timestamp"])
     return df
+
 def delete_row(person_id):
     db_cursor.execute("DELETE FROM person_log WHERE person_id = ?", (person_id,))
     conn.commit()
     st.success(f"Deleted person with ID {person_id}")
-def test_camera(index):
-    cap = cv2.VideoCapture(index)
-    if not cap.isOpened():
-        st.error(f"Failed to open camera at index {index}")
-        return False
-    return True
+
 def peoplecounter():
     model = YOLO('yolov10n.pt')
-    # Define the areas for entry and exit detection (top-left, top-right, bottom-right, bottom-left corners)
     area1 = [(365, 256), (603, 256), (603, 268), (365, 268)]
     area2 = [(365, 288), (603, 288), (603, 272), (365, 272)]
+
     with open("coco.txt", "r") as my_file:
         data = my_file.read()
     class_list = data.split("\n")
@@ -49,42 +51,35 @@ def peoplecounter():
     entering = set()
     people_exiting = {}
     exiting = set()
+
     st.markdown(f"<h2 style='text-align: center;color:white'>Person Counting and Log Viewer</h2>", unsafe_allow_html=True)
     add = option_menu(
-    "Main Menu",
-    ["People Counter", "View/Delete Logs"], 
-   icons = [
-    'person-standing',              # People Counter
-    'file-earmark-text'             # View/Delete Logs
-    ], 
-    menu_icon="menu-up", 
-    default_index=0,orientation="horizontal"
-)    
+        "Main Menu",
+        ["People Counter", "View/Delete Logs"], 
+        icons=['person-standing', 'file-earmark-text'], 
+        menu_icon="menu-up", 
+        default_index=0, 
+        orientation="horizontal"
+    )
+
     if add == 'People Counter':
         use_camera = st.checkbox("Use Live Camera")
-        cap = None
-        cam_url = ""
+
         if use_camera:
-            if test_camera(0):
-                cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-                st.success('Successfully opened live camera!')
-            else:
-                st.error('Camera not accessible. Please check your camera settings.')
-            # uploaded_video = st.file_uploader("Upload a Video", type=["mp4", "avi", "mov"])
-            # if uploaded_video is not None:
-            #     video_bytes = uploaded_video.read()
-            #     cap = cv2.VideoCapture(cv2.VideoCapture(cv2.imdecode(np.frombuffer(video_bytes, np.uint8), cv2.IMREAD_COLOR)))
-            #     st.success('Successfully uploaded video!')
-        if cap is not None:
+            st.write("Starting live camera...")
+            cap = cv2.VideoCapture(0)  # Default camera index
+            if not cap.isOpened():
+                st.error("Failed to open camera. Please check your camera settings.")
+                return
+
             stframe = st.empty()
             count = 0
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
+                    st.error("Failed to grab frame.")
                     break
-                count += 1
-                if count % 2 != 0:
-                    continue
+
                 frame = cv2.resize(frame, (900, 330))
                 results = model.predict(frame)
                 a = results[0].boxes.data
@@ -99,6 +94,7 @@ def peoplecounter():
                     c = class_list[d]
                     if 'person' in c:
                         list_of_boxes.append([x1, y1, x2, y2])
+
                 bbox_id = tracker.update(list_of_boxes)
                 for bbox in bbox_id:
                     x3, y3, x4, y4, person_id = bbox
@@ -128,10 +124,14 @@ def peoplecounter():
                             if person_id not in exiting:
                                 exiting.add(person_id)
                                 log_person_entry_exit(person_id, "exiting")           
+
+                # Draw areas
                 cv2.polylines(frame, [np.array(area1, np.int32)], True, (255, 255, 255))
                 cv2.putText(frame, 'area1', (504, 471), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
                 cv2.polylines(frame, [np.array(area2, np.int32)], True, (255, 255, 255))
                 cv2.putText(frame, 'area2', (466, 485), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)   
+
+                # Display total counts
                 Enter = len(entering)
                 Exit = len(exiting)
                 cv2.putText(frame, 'Total Enter Person', (30, 30), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 1)
@@ -140,18 +140,23 @@ def peoplecounter():
                 cv2.putText(frame, str(Exit), (200, 50), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 255), 1)
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cv2.putText(frame, f'{current_time}', (680, 25), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 1)          
-                stframe.image(frame, channels="BGR", use_column_width=True)
+
+                # Convert frame to image format for display
+                processed_image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                stframe.image(processed_image, use_column_width=True)
+
             cap.release()
+
     if add == 'View/Delete Logs':
         st.markdown(f"<h2 style='text-align: center;color:white'>View People Count</h2>", unsafe_allow_html=True)
         df = view_log()
-        st.dataframe(df,use_container_width=True,hide_index=True,)
+        st.dataframe(df, use_container_width=True, hide_index=True)
         st.markdown(f"<h2 style='text-align: center;color:white'>Delete People Count by Person ID</h2>", unsafe_allow_html=True)
-        person_id_to_delete = st.number_input("Enter Person ID to delete",value=None,step=None)
+        person_id_to_delete = st.number_input("Enter Person ID to delete", value=None, step=None)
         if st.button("Delete Row"):
             delete_row(person_id_to_delete)
             df = view_log()
-            st.dataframe(df,use_container_width=True,hide_index=True)
+            st.dataframe(df, use_container_width=True, hide_index=True)
 
 if __name__ == "__main__":
     peoplecounter()
