@@ -66,7 +66,7 @@ def peoplecounter():
         use_camera = st.checkbox("Use Live Camera")
 
         if use_camera:
-            st.write("Starting live camera...")
+            
             cap = cv2.VideoCapture(1)  # Default camera index
             if not cap.isOpened():
                 st.error("Failed to open camera. Please check your camera settings.")
