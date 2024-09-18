@@ -64,13 +64,21 @@ def peoplecounter():
 
     if add == 'People Counter':
         use_camera = st.checkbox("Use Live Camera")
-
         if use_camera:
-            st.write("Starting live camera...")
-            cap = cv2.VideoCapture(0)  # Default camera index
+            st.write("Starting DroidCam...")
+            droidcam_url = st.text_input("Enter DroidCam URL (e.g., http://192.168.100.63:4747/)", "http://192.168.100.63:4747/video")
+        
+            cap = cv2.VideoCapture(droidcam_url)
             if not cap.isOpened():
-                st.error("Failed to open camera. Please check your camera settings.")
+                st.error("Failed to connect to DroidCam. Please check the URL and connection.")
                 return
+
+        # if use_camera:
+        #     st.write("Starting live camera...")
+        #     cap = cv2.VideoCapture(0)  # Default camera index
+        #     if not cap.isOpened():
+        #         st.error("Failed to open camera. Please check your camera settings.")
+        #         return
 
             stframe = st.empty()
             count = 0
