@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-3 下午4:45
-# @Author : zhuying
-# @Company : Minivision
-# @File : MiniFASNet.py
-# @Software : PyCharm
 import torch
 import torch.nn.functional as F
 from torch.nn import Linear, Conv2d, BatchNorm1d, BatchNorm2d, PReLU, ReLU, Sigmoid, \

@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-4 上午9:59
-# @Author : zhuying
-# @Company : Minivision
-# @File : train_main.py
-# @Software : PyCharm
 
 import torch
 from torch import optim

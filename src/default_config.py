@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-4 上午9:12
-# @Author : zhuying
-# @Company : Minivision
-# @File : default_config.py
-# @Software : PyCharm
-# --*-- coding: utf-8 --*--
 """
 default config for training
 """

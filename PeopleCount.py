@@ -73,22 +73,15 @@ def peoplecounter():
         #     if not cap.isOpened():
         #         st.error("Failed to connect to DroidCam. Please check the URL and connection.")
         #         return
-
-        # for index in range(5):
-        #     cap = cv2.VideoCapture(index)
-        #     if cap.isOpened():
-        #         print(f"Camera opened successfully with index {index}")
-        #         break
-        #     else:
-        #         print(f"Failed to open camera with index {index}")
-       
-
         if use_camera:
-            st.write("Starting live camera...")
-            cap = cv2.VideoCapture(0)  # Default camera index
-            if not cap.isOpened():
-                st.error("Failed to open camera. Please check your camera settings.")
-                return
+            for index in range(5):
+                cap = cv2.VideoCapture(index)
+                if cap.isOpened():
+                    print(f"Camera opened successfully with index {index}")
+                    break
+                else:
+                    print(f"Failed to open camera with index {index}")
+       
 
             stframe = st.empty()
             count = 0

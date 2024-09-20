@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-4 下午4:04
-# @Author : zhuying
-# @Company : Minivision
-# @File : dataset_folder.py
-# @Software : PyCharm
+
 
 import cv2
 import torch

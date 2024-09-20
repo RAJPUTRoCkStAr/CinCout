@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-4 下午6:18
-# @Author : zhuying
-# @Company : Minivision
-# @File : functional.py
-# @Software : PyCharm
+
 
 from __future__ import division
 import torch

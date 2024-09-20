@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-4 下午3:40
-# @Author : zhuying
-# @Company : Minivision
-# @File : dataset_loader.py
-# @Software : PyCharm
+
 
 from torch.utils.data import DataLoader
 from src.data_io.dataset_folder import DatasetFolderFT

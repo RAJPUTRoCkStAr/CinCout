@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-3 下午5:14
-# @Author : zhuying
-# @Company : Minivision
-# @File : MultiFTNet.py
-# @Software : PyCharm
 from torch import nn
 import torch.nn.functional as F
 from src.model_lib.MiniFASNet import MiniFASNetV1,MiniFASNetV2,MiniFASNetV1SE,MiniFASNetV2SE

@@ -60,7 +60,7 @@ def initialize_db():
 
     cursor.execute(f'''
     CREATE TABLE IF NOT EXISTS visitors (
-        Unique_ID INTEGER PRIMARY KEY,
+        Unique_ID INTEGER,
         Name TEXT NOT NULL,
         Email TEXT NOT NULL UNIQUE,
         Workplace TEXT NOT NULL,
@@ -257,7 +257,9 @@ def view_registered_persons():
 
     
     st.dataframe(df[['Unique_ID', 'Name', 'Email','Workplace', 'job_role']], use_container_width=True, hide_index=True)
-###############################################################################
+############################################################################################
+
+############################################################################################
 ## marking attendance
 def Takeattendance():
     st.markdown(f"<h2 style='text-align: center;color:white'>Mark your Attendance</h2>", unsafe_allow_html=True)
