@@ -156,7 +156,6 @@ The project structure is designed to facilitate easy navigation and organization
 │── Attendan.py
 │── Attendmain.py
 │── class.py
-│── coco.txt
 │── Dashboard.py
 │── Dockerfile
 │── main.py
