@@ -82,7 +82,7 @@ def peoplecounter():
         #         print(f"Failed to open camera with index {index}")
         # if use_camera:
             
-            cap = cv2.VideoCapture(0)  # Default camera index
+        cap = cv2.VideoCapture(0)  # Default camera index
             if not cap.isOpened():
                 st.error("Failed to open camera. Please check your camera settings.")
                 return
