@@ -83,9 +83,9 @@ def peoplecounter():
         # if use_camera:
             
         cap = cv2.VideoCapture(0)  # Default camera index
-            if not cap.isOpened():
-                st.error("Failed to open camera. Please check your camera settings.")
-                return
+        if not cap.isOpened():
+            st.error("Failed to open camera. Please check your camera settings.")
+            return
 
             stframe = st.empty()
             count = 0
