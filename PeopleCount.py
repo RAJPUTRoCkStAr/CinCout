@@ -43,9 +43,10 @@ def peoplecounter():
     area1 = [(365, 256), (603, 256), (603, 268), (365, 268)]
     area2 = [(365, 288), (603, 288), (603, 272), (365, 272)]
 
-    with open("coco.txt", "r") as my_file:
-        data = my_file.read()
-    class_list = data.split("\n")
+    # with open("coco.txt", "r") as my_file:
+    #     data = my_file.read()
+    # class_list = data.split("\n")
+    class_list = ["person"]
     tracker = Tracker()
     people_entering = {}
     entering = set()
