@@ -105,18 +105,18 @@ def title():
     </style>
     """
     st.markdown(background_image, unsafe_allow_html=True)
-    st.markdown("""
-    <style>
-        .reportview-container {
-            margin-top: -2em;
-        }
-        #MainMenu {visibility: hidden;}
-        .stDeployButton {display:none;}
-        footer {visibility: hidden;}
-        #stDecoration {display:none;}
-        header {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
+#     st.markdown("""
+#     <style>
+#         .reportview-container {
+#             margin-top: -2em;
+#         }
+#         #MainMenu {visibility: hidden;}
+#         .stDeployButton {display:none;}
+#         footer {visibility: hidden;}
+#         #stDecoration {display:none;}
+#         header {visibility: hidden;}
+#     </style>
+# """, unsafe_allow_html=True)
     
 #################################################################################
 #database connection
