@@ -29,6 +29,7 @@ mpmath
 narwhals
 networkx
 numpy
+openai
 opencv-python-headless
 packaging
 pandas
