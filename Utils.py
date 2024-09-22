@@ -19,20 +19,15 @@ from streamlit_TTS import auto_play,text_to_speech,text_to_audio
 #text-to-speech
 
 def tts(text):
-    # text_to_speech(text=text, language='en')
-    audio=text_to_audio(text=text,language='en')
-    #then play it
-    # auto_play(audio)
-    # audio=text_to_audio("Choose a language, type some text, and click 'Speak it out!'.",language='en')
-#then play it
-    auto_play(audio)
+    tts = gTTS(text=text, lang='en')
+    
+    # Save the audio to a BytesIO object
+    audio_fp = BytesIO()
+    tts.save(audio_fp, format='mp3')
+    audio_fp.seek(0)  # Reset pointer to the start
 
-    lang='en'
-    text=text
-
-    if lang and text:
-    #plays the audio directly
-        text_to_speech(text=text, language=lang)
+    # Use Streamlit to play the audio
+    st.audio(audio_fp, format='audio/mp3')
     
 
 ####################################################################
