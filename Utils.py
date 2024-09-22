@@ -14,12 +14,13 @@ import sqlite3
 import base64
 import re
 import os
-from streamlit_TTS import auto_play
+from streamlit_TTS import auto_play,text_to_speech
 ################################################################
 #text-to-speech
 
 def tts(text):
-    auto_play(text)
+    text_to_speech(text=text, language='en')
+    
 
 ####################################################################
 
