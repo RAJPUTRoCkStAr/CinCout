@@ -23,11 +23,11 @@ def tts(text):
     
     # Save the audio to a BytesIO object
     audio_fp = BytesIO()
-    tts.save(audio_fp, format='mp3')
+    tts.save(audio_fp)
     audio_fp.seek(0)  # Reset pointer to the start
 
     # Use Streamlit to play the audio
-    st.audio(audio_fp, format='audio/mp3')
+    st.audio(audio_fp)
     
 
 ####################################################################
