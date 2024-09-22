@@ -14,22 +14,18 @@ import sqlite3
 import base64
 import re
 import os
-from streamlit_TTS import auto_play,text_to_speech,text_to_audio
+import pyttsx3
+from streamlit_TTS import auto_play
 ################################################################
 #text-to-speech
 
-def ttsi(text, lang='en'):
-    """Generate speech from text and return audio as a BytesIO object."""
-    tts_object = gTTS(text=text, lang=lang)
-    audio_fp = BytesIO()
-    tts_object.save(audio_fp)
-    audio_fp.seek(0)  # Reset pointer to the start
-    return audio_fp
-def tts(text, lang='en'):
-    """Generate and play audio for the given text."""
-    audio_file = ttsi(text, lang)  # Generate audio
-    st.audio(audio_file, format='audio/mp3', start_time=0)
-    
+def tts(text):
+    auto_play(text)
+    engine = pyttsx3.init()
+    engine.setProperty('rate', 150)    # Speed of speech (words per minute)
+    engine.setProperty('volume', 1.0)  # Volume level (0.0 to 1.0)
+    # engine.say(text)
+    engine.runAndWait()
 
 ####################################################################
 
