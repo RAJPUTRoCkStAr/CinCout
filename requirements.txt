@@ -53,6 +53,7 @@ scipy
 seaborn
 six
 smmap
+soundfile
 streamlit
 streamlit-option-menu
 streamlit_TTS
