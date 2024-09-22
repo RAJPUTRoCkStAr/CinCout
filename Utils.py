@@ -25,13 +25,18 @@ import pyttsx3
 #     tts.write_to_fp(audio_fp)
 #     audio_fp.seek(0)
 def tts(text):
-    engine = pyttsx3.init()
-    engine.save_to_file(text, 'speech.wav')
-    engine.runAndWait()
-    data, samplerate = sf.read('speech.wav')
+    # Convert text to speech using gTTS
+    tts = gTTS(text, lang='en')
     virtual_file = io.BytesIO()
-    sf.write(virtual_file, data, samplerate)
-    st.audio(virtual_file.getvalue(), format='audio/wav')
+    
+    # Save the converted speech to a BytesIO object
+    tts.save(virtual_file)
+    
+    # Ensure the buffer is at the start so it can be read correctly
+    virtual_file.seek(0)
+    
+    # Play audio in Streamlit
+    st.audio(virtual_file, format='audio/mp3')
 ####################################################################
 
 ####################################################################
