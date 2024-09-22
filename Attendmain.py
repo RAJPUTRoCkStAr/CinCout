@@ -596,7 +596,7 @@ COLOR_DARK  = (0, 0, 153)
 COLOR_WHITE = (255, 255, 255)
 COLS_INFO   = ['Name']
 COLS_ENCODE = [f'v{i}' for i in range(512)]
-DB_PATH     = os.path.join(ROOT_DIR, "Data/databases.db")
+DB_PATH     = os.path.join(ROOT_DIR, "Data/database.db")
 ####################################################################################
 #################################################################################
 ## Common function for attendance system
@@ -899,221 +899,113 @@ def add_attendance(visitor_id, name_visitor, current_time, image_path):
     cursor.close()
     conn.close()
 ######################################################################
-## marking attendance
-# def Takeattendance():
-#     st.markdown(f"<h2 style='text-align: center;color:white'>Mark your Attendance</h2>", unsafe_allow_html=True)
-#     visitor_id = st.text_input("Enter your Unique ID:", '', max_chars=8)
-#     att_button = st.button("Take Attendance")
-#     if att_button:
-#         if not visitor_id:
-#             st.error("Please enter your Unique ID.")
-#             return
-#         else:
-#             pass
-#     st.info("Ensure only your face is visible to the camera for attendance.")
-#     tts("Ensure only your face is visible to the camera for attendance.")
-#     img_file_buffer = st.camera_input("Take a picture")
-    
-#     if img_file_buffer is not None:
-#         bytes_data = img_file_buffer.getvalue()
-#         image_array = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-#         image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-
-#         # Save the image to visitor history
-#         image_path = os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg')
-#         with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
-#             file.write(img_file_buffer.getbuffer())
-#             tts('Image Saved Successfully!')
-#             st.success('Image Saved Successfully!')
-
-#         # Detect faces in the image using MTCNN
-#         boxes, probs = mtcnn.detect(image_array, landmarks=False)
-        
-#         if boxes is not None:
-#             boxes_int = [[int(box[0]), int(box[1]), int(box[2]), int(box[3])] for box in boxes]
-#             aligned = []
-#             rois = []
-#             spoofs = []
-#             can = []
-
-#             for idx, box in enumerate(boxes_int):
-#                 img = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
-#                 spoof = test(img, "./resources/anti_spoof_models", device)
-#                 if spoof <= 1:
-#                     spoofs.append("REAL")
-#                     can.append(idx)
-
-#                     aligned_face = mtcnn(img)
-#                     if aligned_face is not None:
-#                         encodesCurFrame = resnet(aligned_face.to(device)).detach().cpu()
-#                         aligned.append(encodesCurFrame)
-#                 else:
-#                     spoofs.append("FAKE")
-
-#             if len(aligned) > 0:
-#                 similarity_threshold = 0.5
-#                 flag_show = False
-                
-#                 for face_idx in can:
-#                     database_data = get_data_from_db()
-#                     face_encodings = database_data[COLS_ENCODE].values
-#                     dataframe = database_data[COLS_INFO]
-#                     face_to_compare = aligned[face_idx].numpy()
-
-#                     similarity = np.dot(face_encodings, face_to_compare.T)
-#                     matches = similarity > similarity_threshold
-                    
-#                     if matches.any():
-#                         idx = np.argmax(similarity[matches])
-#                         dataframe_new = dataframe.iloc[idx]
-#                         name_visitor = dataframe_new['Name']
-
-#                         # Record the current time and mark attendance
-#                         current_time = datetime.datetime.now()
-#                         add_attendance(visitor_id, name_visitor, current_time,image_path)
-
-#                         flag_show = True
-#                         (left, top, right, bottom) = (boxes_int[face_idx])
-#                         rois.append(image_array_copy[top:bottom, left:right].copy())
-                        
-#                         cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
-#                         cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
-#                         font = cv2.FONT_HERSHEY_DUPLEX
-#                         cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
-#                     else:
-#                         tts('No Match Found for the given Similarity Threshold!')
-#                         st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
-#                         st.info('Please Update the database for a new person or click again!')
-#                         add_attendance(visitor_id, 'Unknown', current_time)
-
-#                 if flag_show:
-#                     st.image(BGR_to_RGB(image_array_copy), width=720)
-#             else:
-#                 tts('No real faces detected')
-#                 st.error('No real faces detected')
-#         else:
-#             tts('No human face detected.')
-#             st.error('No human face detected.')
+#marking of attendance
 def Takeattendance():
     st.markdown(f"<h2 style='text-align: center;color:white'>Mark your Attendance</h2>", unsafe_allow_html=True)
     visitor_id = st.text_input("Enter your Unique ID:", '', max_chars=8)
-    att_button = st.button("Take Attendance")
+    if not visitor_id:
+        st.error("Please enter your Unique ID.")
+        return
     
-    if att_button:
-        if not visitor_id:
-            st.error("Please enter your Unique ID.")
+    # Fetch the last attendance record for the visitor
+    conn = connect_db()
+    cursor = conn.cursor()
+    today_date = datetime.date.today()
+    
+    query = """
+    SELECT timing
+    FROM attendance
+    WHERE ID = ? AND DATE(timing) = ?
+    ORDER BY timing DESC LIMIT 1
+    """
+    cursor.execute(query, (visitor_id, today_date))
+    last_record = cursor.fetchone()
+    
+    current_time = datetime.datetime.now()
+    
+    if last_record:
+        last_attendance_time = datetime.datetime.fromisoformat(last_record[0])
+        time_diff = (current_time - last_attendance_time).total_seconds() / 3600  
+    
+        if time_diff < 4:
+            remaining_time = round(4 - time_diff, 2)
+            remaining_hours = int(remaining_time)
+            remaining_minutes = int((remaining_time - remaining_hours) * 60)
+            st.error(f"Please wait {remaining_hours} hours and {remaining_minutes} minutes before the next entry.")
             return
+    st.info("Ensure only your face is visible to the camera for attendance.")
+    tts("Ensure only your face is visible to the camera for attendance.")
+    img_file_buffer = st.camera_input("Take a picture")
+    if img_file_buffer is not None:
+        bytes_data = img_file_buffer.getvalue()
+        image_array = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+        image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+        # Save the image to visitor history
+        image_path = os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg')
+        with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
+            file.write(img_file_buffer.getbuffer())
+            tts('Image Saved Successfully!')
+            st.success('Image Saved Successfully!')
+        # Detect faces in the image using MTCNN
+        boxes, probs = mtcnn.detect(image_array, landmarks=False)
         
-        # Fetch the last attendance record for the visitor
-        conn = connect_db()
-        cursor = conn.cursor()
-        today_date = datetime.date.today()
-        
-        query = """
-        SELECT timing
-        FROM attendance
-        WHERE ID = ? AND DATE(timing) = ?
-        ORDER BY timing DESC LIMIT 1
-        """
-        cursor.execute(query, (visitor_id, today_date))
-        last_record = cursor.fetchone()
-        
-        current_time = datetime.datetime.now()
-        
-        if last_record:
-            last_attendance_time = datetime.datetime.fromisoformat(last_record[0])
-            time_diff = (current_time - last_attendance_time).total_seconds() / 3600  
-        
-            if time_diff < 4:
-                remaining_time = round(4 - time_diff, 2)
-                remaining_hours = int(remaining_time)
-                remaining_minutes = int((remaining_time - remaining_hours) * 60)
-                st.error(f"Please wait {remaining_hours} hours and {remaining_minutes} minutes before the next entry.")
-                return
-
-        st.info("Ensure only your face is visible to the camera for attendance.")
-        tts("Ensure only your face is visible to the camera for attendance.")
-        img_file_buffer = st.camera_input("Take a picture")
-
-        if img_file_buffer is not None:
-            bytes_data = img_file_buffer.getvalue()
-            image_array = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-            image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-
-            # Save the image to visitor history
-            image_path = os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg')
-            with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
-                file.write(img_file_buffer.getbuffer())
-                tts('Image Saved Successfully!')
-                st.success('Image Saved Successfully!')
-
-            # Detect faces in the image using MTCNN
-            boxes, probs = mtcnn.detect(image_array, landmarks=False)
-            
-            if boxes is not None:
-                boxes_int = [[int(box[0]), int(box[1]), int(box[2]), int(box[3])] for box in boxes]
-                aligned = []
-                rois = []
-                spoofs = []
-                can = []
-
-                for idx, box in enumerate(boxes_int):
-                    img = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
-                    spoof = test(img, "./resources/anti_spoof_models", device)
-                    if spoof <= 1:
-                        spoofs.append("REAL")
-                        can.append(idx)
-
-                        aligned_face = mtcnn(img)
-                        if aligned_face is not None:
-                            encodesCurFrame = resnet(aligned_face.to(device)).detach().cpu()
-                            aligned.append(encodesCurFrame)
-                    else:
-                        spoofs.append("FAKE")
-
-                if len(aligned) > 0:
-                    similarity_threshold = 0.5
-                    flag_show = False
-                    
-                    for face_idx in can:
-                        database_data = get_data_from_db()
-                        face_encodings = database_data[COLS_ENCODE].values
-                        dataframe = database_data[COLS_INFO]
-                        face_to_compare = aligned[face_idx].numpy()
-
-                        similarity = np.dot(face_encodings, face_to_compare.T)
-                        matches = similarity > similarity_threshold
-                        
-                        if matches.any():
-                            idx = np.argmax(similarity[matches])
-                            dataframe_new = dataframe.iloc[idx]
-                            name_visitor = dataframe_new['Name']
-
-                            # Record the current time and mark attendance
-                            add_attendance(visitor_id, name_visitor, current_time, image_path)
-
-                            flag_show = True
-                            (left, top, right, bottom) = (boxes_int[face_idx])
-                            rois.append(image_array_copy[top:bottom, left:right].copy())
-                            
-                            cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
-                            cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
-                            font = cv2.FONT_HERSHEY_DUPLEX
-                            cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
-                        else:
-                            tts('No Match Found for the given Similarity Threshold!')
-                            st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
-                            st.info('Please Update the database for a new person or click again!')
-                            add_attendance(visitor_id, 'Unknown', current_time, image_path)
-
-                    if flag_show:
-                        st.image(BGR_to_RGB(image_array_copy), width=720)
+        if boxes is not None:
+            boxes_int = [[int(box[0]), int(box[1]), int(box[2]), int(box[3])] for box in boxes]
+            aligned = []
+            rois = []
+            spoofs = []
+            can = []
+            for idx, box in enumerate(boxes_int):
+                img = crop_image_with_ratio(image_array, 160, 160, int((box[0] + box[2]) / 2))
+                spoof = test(img, "./resources/anti_spoof_models", device)
+                if spoof <= 1:
+                    spoofs.append("REAL")
+                    can.append(idx)
+                    aligned_face = mtcnn(img)
+                    if aligned_face is not None:
+                        encodesCurFrame = resnet(aligned_face.to(device)).detach().cpu()
+                        aligned.append(encodesCurFrame)
                 else:
-                    tts('No real faces detected')
-                    st.error('No real faces detected')
+                    spoofs.append("FAKE")
+            if len(aligned) > 0:
+                similarity_threshold = 0.5
+                flag_show = False
+                
+                for face_idx in can:
+                    database_data = get_data_from_db()
+                    face_encodings = database_data[COLS_ENCODE].values
+                    dataframe = database_data[COLS_INFO]
+                    face_to_compare = aligned[face_idx].numpy()
+                    similarity = np.dot(face_encodings, face_to_compare.T)
+                    matches = similarity > similarity_threshold
+                    
+                    if matches.any():
+                        idx = np.argmax(similarity[matches])
+                        dataframe_new = dataframe.iloc[idx]
+                        name_visitor = dataframe_new['Name']
+                        # Record the current time and mark attendance
+                        add_attendance(visitor_id, name_visitor, current_time, image_path)
+                        flag_show = True
+                        (left, top, right, bottom) = (boxes_int[face_idx])
+                        rois.append(image_array_copy[top:bottom, left:right].copy())
+                        
+                        cv2.rectangle(image_array_copy, (left, top), (right, bottom), COLOR_DARK, 2)
+                        cv2.rectangle(image_array_copy, (left, bottom + 35), (right, bottom), COLOR_DARK, cv2.FILLED)
+                        font = cv2.FONT_HERSHEY_DUPLEX
+                        cv2.putText(image_array_copy, f"#{name_visitor}", (left + 5, bottom + 25), font, .55, COLOR_WHITE, 1)
+                    else:
+                        tts('No Match Found for the given Similarity Threshold!')
+                        st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
+                        st.info('Please Update the database for a new person or click again!')
+                        add_attendance(visitor_id, 'Unknown', current_time, image_path)
+                if flag_show:
+                    st.image(BGR_to_RGB(image_array_copy), width=720)
             else:
-                tts('No human face detected.')
-                st.error('No human face detected.')
+                tts('No real faces detected')
+                st.error('No real faces detected')
+        else:
+            tts('No human face detected.')
+            st.error('No human face detected.')
 
 
 def send_email(recipient_email, subject, body,unique_id):
