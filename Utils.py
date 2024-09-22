@@ -18,16 +18,17 @@ from streamlit_TTS import auto_play,text_to_speech,text_to_audio
 ################################################################
 #text-to-speech
 
-def tts(text):
-    tts = gTTS(text=text, lang='en')
-    
-    # Save the audio to a BytesIO object
+def ttsi(text, lang='en'):
+    """Generate speech from text and return audio as a BytesIO object."""
+    tts_object = gTTS(text=text, lang=lang)
     audio_fp = BytesIO()
-    tts.save(audio_fp)
+    tts_object.save(audio_fp)
     audio_fp.seek(0)  # Reset pointer to the start
-
-    # Use Streamlit to play the audio
-    st.audio(audio_fp)
+    return audio_fp
+def tts(text, lang='en'):
+    """Generate and play audio for the given text."""
+    audio_file = ttsi(text, lang)  # Generate audio
+    st.audio(audio_file, format='audio/mp3', start_time=0)
     
 
 ####################################################################
