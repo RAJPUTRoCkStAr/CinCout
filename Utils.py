@@ -22,7 +22,17 @@ def tts(text):
     # text_to_speech(text=text, language='en')
     audio=text_to_audio(text=text,language='en')
     #then play it
+    # auto_play(audio)
+    # audio=text_to_audio("Choose a language, type some text, and click 'Speak it out!'.",language='en')
+#then play it
     auto_play(audio)
+
+    lang='en'
+    text=text
+
+    if lang and text:
+    #plays the audio directly
+        text_to_speech(text=text, language=lang)
     
 
 ####################################################################
