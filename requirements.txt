@@ -9,7 +9,6 @@ colorama
 comtypes
 contourpy
 cycler
-espeak
 facenet-pytorch
 filelock
 fonttools
