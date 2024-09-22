@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 import streamlit as st
 import pandas as pd
 from gtts import gTTS
-import io 
+from io import BytesIO
 import random
 import string
 import smtplib
@@ -16,27 +16,18 @@ import re
 import os
 import soundfile as sf
 import pyttsx3
+from streamlit_TTS import auto_play
 ################################################################
 #text-to-speech
 
-# def tts(text):
-#     tts = gTTS(text=text, lang='en')
-#     audio_fp = BytesIO()  # Create a file-like object in memory
-#     tts.write_to_fp(audio_fp)
-#     audio_fp.seek(0)
 def tts(text):
-    # Convert text to speech using gTTS
-    tts = gTTS(text, lang='en')
-    virtual_file = io.BytesIO()
-    
-    # Save the converted speech to a BytesIO object
-    tts.save(virtual_file)
-    
-    # Ensure the buffer is at the start so it can be read correctly
-    virtual_file.seek(0)
-    
-    # Play audio in Streamlit
-    st.audio(virtual_file, format='audio/mp3')
+    engine = pyttsx3.init()
+    engine.setProperty('rate', 150)    # Speed of speech (words per minute)
+    engine.setProperty('volume', 1.0)  # Volume level (0.0 to 1.0)
+    # engine.say(text)
+    auto_play(text)
+    engine.runAndWait()
+
 ####################################################################
 
 ####################################################################
