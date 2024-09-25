@@ -39,12 +39,17 @@ if st.session_state.logged_in:
 if not st.session_state.logged_in and not st.session_state.admin_mode:
     with st.sidebar:
         app = option_menu(
-            "Main Menu",
-            ["Monitor", "Attendance", "Search Attendance", "Sign Up", "Login", "Contact Us"], 
+            None,
+            ["Attendance",
+            "Search Attendance",
+            "Monitor", 
+            "Sign Up",
+            "Login", 
+            "Contact Us"], 
             icons=[
-                'eye-fill',        # Monitor
                 'check2-square',   # Attendance
                 'search',          # Search Attendance
+                'eye-fill',        # Monitor
                 'person-plus',     # Sign Up
                 'person-lock',     # Login
                 'envelope'         # Contact Us

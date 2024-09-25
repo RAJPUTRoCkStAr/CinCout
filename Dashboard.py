@@ -7,7 +7,7 @@ import sqlite3
 def dashboard():
 
     with st.sidebar:
-        selected = option_menu("Dashboard Menu", 
+        selected = option_menu(None, 
         ['Manage Attendance', 
          'ADD', 
          'Profile Setting', 

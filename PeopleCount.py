@@ -30,7 +30,7 @@ def log_person_entry_exit(person_id, status):
 def view_log():
     db_cursor.execute("SELECT * FROM person_log")
     data = db_cursor.fetchall()
-    df = pd.DataFrame(data, columns=["person_id", "status", "timestamp"])
+    df = pd.DataFrame(data, columns=["Sno","person_id", "status", "timestamp"])
     return df
 
 def delete_row(person_id):
@@ -43,10 +43,10 @@ def peoplecounter():
     area1 = [(365, 256), (603, 256), (603, 268), (365, 268)]
     area2 = [(365, 288), (603, 288), (603, 272), (365, 272)]
 
-    # with open("coco.txt", "r") as my_file:
-    #     data = my_file.read()
-    # class_list = data.split("\n")
-    class_list = ["person"]
+    with open("coco.txt", "r") as my_file:
+        data = my_file.read()
+    class_list = data.split("\n")
+    
     tracker = Tracker()
     people_entering = {}
     entering = set()
@@ -74,13 +74,11 @@ def peoplecounter():
         #         st.error("Failed to connect to DroidCam. Please check the URL and connection.")
         #         return
         if use_camera:
-            for index in range(5):
-                cap = cv2.VideoCapture(index)
-                if cap.isOpened():
-                    print(f"Camera opened successfully with index {index}")
-                    break
-                else:
-                    print(f"Failed to open camera with index {index}")
+            cap = cv2.VideoCapture(0)
+            if cap.isOpened():
+                print(f"Camera opened successfully")
+            else:
+                print(f"Failed to open camera")
        
 
             stframe = st.empty()
@@ -161,13 +159,13 @@ def peoplecounter():
     if add == 'View/Delete Logs':
         st.markdown(f"<h2 style='text-align: center;color:white'>View People Count</h2>", unsafe_allow_html=True)
         df = view_log()
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, use_container_width=True)
         st.markdown(f"<h2 style='text-align: center;color:white'>Delete People Count by Person ID</h2>", unsafe_allow_html=True)
         person_id_to_delete = st.number_input("Enter Person ID to delete", value=None, step=None)
         if st.button("Delete Row"):
             delete_row(person_id_to_delete)
             df = view_log()
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, use_container_width=True)
 
 if __name__ == "__main__":
     peoplecounter()

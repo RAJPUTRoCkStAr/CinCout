@@ -71,7 +71,7 @@ def initialize_db():
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS attendance (
-        ID TEXT PRIMARY KEY,
+        ID TEXT,
         visitor_name TEXT,
         timing TIMESTAMP,
         status TEXT,
@@ -273,66 +273,53 @@ def add_attendance(visitor_id, name_visitor, current_time, image_path):
     conn = connect_db()
     cursor = conn.cursor()
     today_date = current_time.date()
-    
-    # Check if there is already an attendance record for today
+
+    # Check if an entry exists for today (status = 'Entry')
     query = """
     SELECT timing, status
     FROM attendance
-    WHERE ID = ? AND DATE(timing) = ?
-    ORDER BY timing ASC LIMIT 1
+    WHERE ID = ? AND DATE(timing) = ? AND status = 'Entry'
     """
     cursor.execute(query, (visitor_id, today_date))
     record = cursor.fetchone()
 
     if record:
-        # If a record exists, calculate time difference from the first entry
-        first_entry_time = datetime.datetime.fromisoformat(record[0])
-        time_diff = current_time - first_entry_time
-        hours_diff = time_diff.total_seconds() / 3600
-
-        if 4 <= hours_diff < 8:
-            status = "Half Day"
-            # Update the same record with the new status
-            update_query = """
-            UPDATE attendance
-            SET status = ?, timing = ?
-            WHERE ID = ? AND DATE(timing) = ?
+        # If an entry exists, mark this event as an "Exit"
+        status = "Exit"
+        try:
+            insert_query = """
+            INSERT INTO attendance (ID, visitor_name, timing, status, image_path)
+            VALUES (?, ?, ?, ?, ?)
             """
-            cursor.execute(update_query, (status, current_time, visitor_id, today_date))
-            conn.commit()
-            tts(f"{status} marked for {name_visitor}")
-            st.info(f"{status} marked for {name_visitor}")
-        elif hours_diff >= 8:
-            status = "Full Day"
-            # Update the same record with the new status
-            update_query = """
-            UPDATE attendance
-            SET status = ?, timing = ?
-            WHERE ID = ? AND DATE(timing) = ?
-            """
-            cursor.execute(update_query, (status, current_time, visitor_id, today_date))
-            conn.commit()
-            tts(f"{status} marked for {name_visitor}")
-            st.info(f"{status} marked for {name_visitor}")
-        else:
-            remaining_hours = 4 - hours_diff if hours_diff < 4 else 8 - hours_diff
-            remaining_hours_int = int(remaining_hours)
-            remaining_minutes = int((remaining_hours - remaining_hours_int) * 60)
-            st.warning(f"Attendance already marked at {first_entry_time}. Please wait {remaining_hours_int} hours and {remaining_minutes} minutes before the next entry.")
-            tts(f"Attendance already marked at {first_entry_time}. Please wait {remaining_hours_int} hours and {remaining_minutes} minutes before the next entry.")
-
-            return
+            cursor.execute(insert_query, (visitor_id, name_visitor, current_time, status, image_path))
+            conn.commit()  # Commit the new "Exit" row
+            tts(f"Exit marked for {name_visitor}")
+            st.info(f"Exit marked for {name_visitor}")
+        except Exception as e:
+            conn.rollback()  # Rollback in case of error
+            st.error(f"Error marking exit: {e}")
     else:
-        insert_query = """
-        INSERT INTO attendance (ID, visitor_name, timing, status, image_path)
-        VALUES (?, ?, ?, ?, ?)
-        """
-        cursor.execute(insert_query, (visitor_id, name_visitor, current_time, "Present", image_path))
-        conn.commit()
-        tts(f"Attendance marked as Present for {name_visitor}")
-        st.success(f"Attendance marked as Present for {name_visitor}")
+        # If no entry exists for today, mark this event as an "Entry"
+        status = "Entry"
+        try:
+            insert_query = """
+            INSERT INTO attendance (ID, visitor_name, timing, status, image_path)
+            VALUES (?, ?, ?, ?, ?)
+            """
+            cursor.execute(insert_query, (visitor_id, name_visitor, current_time, status, image_path))
+            conn.commit()  # Commit the new "Entry" row
+            tts(f"Entry marked for {name_visitor}")
+            st.success(f"Entry marked for {name_visitor}")
+        except Exception as e:
+            conn.rollback()  # Rollback in case of error
+            st.error(f"Error marking entry: {e}")
+    
     cursor.close()
     conn.close()
+
+
+
+
 ######################################################################
 #marking of attendance
 def Takeattendance():
@@ -342,45 +329,24 @@ def Takeattendance():
         st.error("Please enter your Unique ID.")
         return
     
-    # Fetch the last attendance record for the visitor
-    conn = connect_db()
-    cursor = conn.cursor()
-    today_date = datetime.date.today()
-    
-    query = """
-    SELECT timing
-    FROM attendance
-    WHERE ID = ? AND DATE(timing) = ?
-    ORDER BY timing DESC LIMIT 1
-    """
-    cursor.execute(query, (visitor_id, today_date))
-    last_record = cursor.fetchone()
-    
     current_time = datetime.datetime.now()
     
-    if last_record:
-        last_attendance_time = datetime.datetime.fromisoformat(last_record[0])
-        time_diff = (current_time - last_attendance_time).total_seconds() / 3600  
-    
-        if time_diff < 4:
-            remaining_time = round(4 - time_diff, 2)
-            remaining_hours = int(remaining_time)
-            remaining_minutes = int((remaining_time - remaining_hours) * 60)
-            st.error(f"Please wait {remaining_hours} hours and {remaining_minutes} minutes before the next entry.")
-            return
     st.info("Ensure only your face is visible to the camera for attendance.")
     tts("Ensure only your face is visible to the camera for attendance.")
+    
     img_file_buffer = st.camera_input("Take a picture")
     if img_file_buffer is not None:
         bytes_data = img_file_buffer.getvalue()
         image_array = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         image_array_copy = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+        
         # Save the image to visitor history
         image_path = os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg')
         with open(os.path.join(VISITOR_HISTORY, f'{visitor_id}.jpg'), 'wb') as file:
             file.write(img_file_buffer.getbuffer())
             tts('Image Saved Successfully!')
             st.success('Image Saved Successfully!')
+        
         # Detect faces in the image using MTCNN
         boxes, probs = mtcnn.detect(image_array, landmarks=False)
         
@@ -402,6 +368,7 @@ def Takeattendance():
                         aligned.append(encodesCurFrame)
                 else:
                     spoofs.append("FAKE")
+            
             if len(aligned) > 0:
                 similarity_threshold = 0.5
                 flag_show = False
@@ -418,7 +385,8 @@ def Takeattendance():
                         idx = np.argmax(similarity[matches])
                         dataframe_new = dataframe.iloc[idx]
                         name_visitor = dataframe_new['Name']
-                        # Record the current time and mark attendance
+                        
+                        # Record the current time and mark attendance (either Entry or Exit)
                         add_attendance(visitor_id, name_visitor, current_time, image_path)
                         flag_show = True
                         (left, top, right, bottom) = (boxes_int[face_idx])
@@ -433,6 +401,7 @@ def Takeattendance():
                         st.error(f'No Match Found for the given Similarity Threshold! for face#{face_idx}')
                         st.info('Please Update the database for a new person or click again!')
                         add_attendance(visitor_id, 'Unknown', current_time, image_path)
+                
                 if flag_show:
                     st.image(BGR_to_RGB(image_array_copy), width=720)
             else:
