@@ -317,9 +317,6 @@ def add_attendance(visitor_id, name_visitor, current_time, image_path):
     cursor.close()
     conn.close()
 
-
-
-
 ######################################################################
 #marking of attendance
 def Takeattendance():
