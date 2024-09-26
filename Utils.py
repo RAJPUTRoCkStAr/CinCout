@@ -13,9 +13,7 @@ import smtplib
 import sqlite3
 import base64
 import re
-import os
-import pyttsx3
-from streamlit_TTS import auto_play
+
 ################################################################
 #text-to-speech
 
