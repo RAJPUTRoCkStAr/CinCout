@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from Utils import title, contact, login, signup, admin_login
-from PeopleCount import peoplecounter
 from Attendmain import search_attendance
 from Attendan import atten
 from Dashboard import dashboard
@@ -59,7 +58,7 @@ if not st.session_state.logged_in and not st.session_state.admin_mode:
         )
 
     if app == "Monitor":
-        peoplecounter()
+        pass# peoplecounter()
     elif app == "Attendance":
         atten()
     elif app == "Search Attendance":
