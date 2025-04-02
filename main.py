@@ -40,15 +40,13 @@ if not st.session_state.logged_in and not st.session_state.admin_mode:
         app = option_menu(
             None,
             ["Attendance",
-            "Search Attendance",
-            "Monitor", 
+            "Search Attendance", 
             "Sign Up",
             "Login", 
             "Contact Us"], 
             icons=[
                 'check2-square',   # Attendance
                 'search',          # Search Attendance
-                'eye-fill',        # Monitor
                 'person-plus',     # Sign Up
                 'person-lock',     # Login
                 'envelope'         # Contact Us
@@ -57,9 +55,7 @@ if not st.session_state.logged_in and not st.session_state.admin_mode:
             default_index=0,
         )
 
-    if app == "Monitor":
-        pass# peoplecounter()
-    elif app == "Attendance":
+    if app == "Attendance":
         atten()
     elif app == "Search Attendance":
         search_attendance()
