@@ -34,7 +34,7 @@ opencv-python-headless
 packaging
 pandas
 pillow
-protobuf
+protobuf==3.20.*
 psutil
 py-cpuinfo
 pyarrow
