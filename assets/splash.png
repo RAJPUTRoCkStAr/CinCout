@@ -1,0 +1,11 @@
+<svg width="1284" height="2778" viewBox="0 0 1284 2778" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1284" height="2778" fill="#376bdc"/>
+<g transform="translate(642, 1389)">
+<circle cx="0" cy="-200" r="150" fill="white"/>
+<rect x="-150" y="-50" width="300" height="100" rx="50" fill="white"/>
+<rect x="-200" y="70" width="400" height="80" rx="40" fill="white"/>
+<rect x="-150" y="170" width="300" height="60" rx="30" fill="white"/>
+<text x="0" y="300" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="bold">C-In C-Out</text>
+<text x="0" y="360" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="32">Attendance</text>
+</g>
+</svg>
